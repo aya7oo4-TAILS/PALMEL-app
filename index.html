@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PARMEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0d0e;
+      --card-bg: linear-gradient(135deg, #24292e 0%, #16181b 100%);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      --avatar-bg: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05));
+      --text-main: #f5f6f8;
+      --text-sub: #9aa0a6;
+      --gold: #e5c07b;
+      --radius-card: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body.mypal-mode {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 12px 12px 0px;
+    }
+
+    .app-viewport {
+      width: 100%;
+      max-width: 414px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .page { display: none; flex-direction: column; gap: 16px; width: 100%; }
+    .page.active { display: flex; }
+
+    #page-mypal {
+      height: calc(100vh - 80px);
+      justify-content: flex-start;
+    }
+
+    .action-btn-main {
+      width: 100%; background: linear-gradient(135deg, var(--gold), #d4a359);
+      color: #000; font-weight: bold; border: none; border-radius: 20px;
+      padding: 12px 0; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(229,192,123,0.3); text-align: center;
+    }
+
+    /* 名刺カード（3Dフリップ用コンテナ） */
+    .palcard-container {
+      perspective: 1000px;
+      width: 100%;
+      aspect-ratio: 1.55 / 1;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .palcard-flipper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .palcard-container.flipped .palcard-flipper {
+      transform: rotateY(180deg);
+    }
+
+    /* 名刺カードデザイン共通 */
+    .palcard {
+      position: absolute;
+      inset: 0;
+      background: var(--card-bg);
+      background-size: cover;
+      background-position: center;
+      border-radius: var(--radius-card);
+      padding: 12px 14px 44px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: hidden;
+      transition: background 0.3s ease;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .palcard-back {
+      transform: rotateY(180deg);
+      justify-content: space-between;
+    }
+
+    .palcard.theme-navy { background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%) !important; }
+    .palcard.theme-emerald { background: linear-gradient(135deg, #0d3b2e 0%, #051a14 100%) !important; }
+    .palcard.theme-wine { background: linear-gradient(135deg, #3b1b26 0%, #1a050d 100%) !important; }
+    .palcard.theme-gold { background: linear-gradient(135deg, #3d321d 0%, #1c160b 100%) !important; border-color: rgba(229, 192, 123, 0.5) !important; }
+    .palcard.theme-flame { background: radial-gradient(circle at 80% 20%, #00d2ff 0%, #001122 40%, #05050a 100%) !important; border-color: #00f2fe !important; }
+
+    .palcard-brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-sub); font-weight: 600; text-align: center; margin-bottom: 2px; }
+    .palcard-body { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex: 1; }
+    
+    .profile-info { flex: 1; display: flex; flex-direction: column; min-width: 0; justify-content: flex-start; margin-top: 10px; }
+    
+    .user-title-display {
+      font-size: 0.58rem;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .pet-name { 
+      font-family: 'Cinzel', serif; 
+      font-size: 1.8rem; 
+      line-height: 1.0; 
+      margin-bottom: 6px; 
+      font-weight: 700; 
+      color: #fff; 
+      letter-spacing: 0.02em; 
+    }
+    
+    .profile-fields { display: flex; flex-direction: column; gap: 3px; }
+    .field-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1px; }
+    .field-label { font-size: 0.52rem; color: var(--text-sub); width: 60px; flex-shrink: 0; }
+    .field-value { color: var(--text-main); font-size: 0.6rem; font-weight: 500; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .right-avatar-container { 
+      position: relative; 
+      width: 155px; 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      margin-top: 28px;
+    }
+    .avatar-wrapper { width: 150px; height: 150px; border-radius: 50%; padding: 3px; background: var(--avatar-bg); cursor: pointer; display: block; transition: all 0.3s ease; }
+    
+    .avatar-wrapper.frame-gold {
+      background: linear-gradient(135deg, #ffe066 0%, #e5c07b 50%, #b38600 100%) !important;
+      box-shadow: 0 0 12px rgba(229, 192, 123, 0.5) !important;
+    }
+    .avatar-wrapper.frame-silver {
+      background: linear-gradient(135deg, #ffffff 0%, #a8b2c1 50%, #6c757d 100%) !important;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.3) !important;
+    }
+    .avatar-wrapper.frame-neon {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
+      box-shadow: 0 0 16px rgba(79, 172, 254, 0.7) !important;
+    }
+    .avatar-wrapper.frame-flame {
+      background: linear-gradient(135deg, #00f2fe, #0044ff, #000) !important;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.8) !important;
+    }
+
+    .avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #1a1d20; }
+    .avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+    .palcard-footer { position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+    .footer-left-group { display: flex; gap: 6px; }
+    .icon-btn {
+      height: 26px; padding: 0 10px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.22); 
+      border-radius: 8px; color: var(--text-main); font-size: 0.52rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 500; text-decoration: none;
+    }
+
+    .sns-links-container { display: flex; gap: 6px; align-items: center; }
+    .sns-btn {
+      display: none; height: 26px; width: 26px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px; color: var(--text-main); font-size: 0.7rem; align-items: center; justify-content: center; text-decoration: none;
+    }
+    .sns-btn.active { display: flex; }
+
+    /* 背面カード専用のデザインレイアウト */
+    .back-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      gap: 14px;
+      text-align: center;
+      padding: 10px 0 20px;
+    }
+    .back-owner-title {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--text-sub);
+    }
+    .back-owner-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .back-sns-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 220px;
+    }
+    .back-sns-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 0.7rem;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .back-sns-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .back-sns-item.inactive {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .back-flip-tip {
+      font-size: 0.48rem;
+      color: var(--text-sub);
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+
+    .palcard.is-presented .profile-fields { display: none !important; }
+    .palcard.is-presented .palcard-footer { display: none !important; }
+    .palcard.is-presented .palcard-brand { display: block !important; margin-bottom: 0px !important; }
+
+    .palcard.is-presented .palcard-body {
+      display: flex !important; flex-direction: row !important; align-items: center !important;
+      justify-content: space-between !important; height: 100% !important; gap: 0 !important; margin-top: 0 !important;
+    }
+
+    .palcard.is-presented .profile-info {
+      flex: 1 !important; display: flex !important; flex-direction: column !important;
+      align-items: center !important; justify-content: center !important; height: 100% !important; margin-top: 0 !important; padding: 10px !important;
+    }
+
+    .palcard.is-presented .right-avatar-container {
+      flex: 1 !important; width: auto !important; height: 100% !important; margin-top: 0 !important;
+      display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 10px !important; gap: 6px !important;
+    }
+
+    .palcard.is-presented .right-avatar-container .avatar-wrapper { width: 110px !important; height: 110px !important; margin: 0 !important; flex-shrink: 0 !important; display: block !important; }
+    .palcard.is-presented .present-pet-name { display: block !important; font-family: 'Cinzel', serif; font-size: 1.3rem !important; margin: 0 !important; text-align: center !important; line-height: 1.1 !important; color: #fff; font-weight: 700; }
+    .palcard.is-presented .pet-name { display: none !important; }
+    .palcard.is-presented .user-title-display { display: none !important; }
+
+    /* 9マス Grid */
+    .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
+    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; }
+    
+    .grid-label-input {
+      background: transparent; border: none; border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
+      color: var(--gold); font-family: inherit; font-size: 0.58rem; text-align: center; width: 90%; outline: none; letter-spacing: 0.05em; font-weight: bold;
+    }
+    .grid-label-input::placeholder { color: rgba(229, 192, 123, 0.4); }
+    .grid-label-input:focus { border-bottom-color: var(--gold); background: rgba(0, 0, 0, 0.3); }
+
+    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .grid-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    input[type="file"] { display: none; }
+
+    .grid-number-box {
+      flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1b2025 0%, #101214 100%);
+      position: relative;
+    }
+    .grid-number-box::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(229,192,123,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .styled-number {
+      font-family: 'Cinzel', serif;
+      font-size: 2.8rem;
+      font-weight: 500;
+      color: var(--gold);
+      opacity: 0.85;
+      letter-spacing: -0.05em;
+    }
+
+    .feed-post-card {
+      background: #16181b; border-radius: var(--radius-card); border: 1px solid var(--card-border);
+      padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.1s ease;
+    }
+    .feed-post-card:active { transform: scale(0.99); }
+    
+    .feed-header { display: flex; align-items: center; gap: 10px; }
+    .feed-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; border: 1px solid var(--gold); flex-shrink: 0; }
+    .feed-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .feed-user-info { display: flex; flex-direction: column; }
+    .feed-pet-name { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.1; }
+    .feed-title { font-size: 0.6rem; color: var(--gold); }
+
+    .single-media-box { width: 100%; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.05); }
+    .single-media-box img { width: 100%; height: 100%; object-fit: cover; }
+    .feed-single-caption { font-size: 0.78rem; color: var(--text-main); margin-top: 4px; line-height: 1.4; word-break: break-all; }
+
+    .mini-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; border-radius: 12px; overflow: hidden; }
+    .mini-grid-item { aspect-ratio: 1; background: #202428; overflow: hidden; }
+    .mini-grid-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95); backdrop-filter: blur(12px); z-index: 8500; justify-content: center; align-items: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; padding: 20px; max-height: 85vh; overflow-y: auto; }
+
+    #page-album {
+      height: calc(100vh - 80px);
+      justify-content: flex-start;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    #page-album.active {
+      display: flex;
+    }
+    .album-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 40px;
+    }
+    .album-entry-card {
+      background: #16181b;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .album-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 6px;
+      padding-right: 24px;
+    }
+    .album-delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-sub);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .album-delete-btn:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: rgba(255, 107, 107, 0.4);
+      color: #ff6b6b;
+    }
+
+    #page-exchange-cards {
+      height: calc(100vh - 80px);
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+    #exchange-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 20px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .form-label { font-size: 0.7rem; color: var(--text-sub); }
+    .form-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; }
+    .form-input:focus { border-color: var(--gold); }
+
+    .user-profile-modal { display: none; position: fixed; inset: 0; background: #0b0d0e; z-index: 10000; overflow-y: auto; padding: 16px 12px 100px; }
+    .user-profile-modal.active { display: flex; flex-direction: column; align-items: center; }
+    .profile-modal-container { width: 100%; max-width: 414px; display: flex; flex-direction: column; gap: 16px; position: relative; }
+    .close-modal-btn {
+      position: absolute; right: 0; top: -5px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; border-radius: 50%; width: 32px; height: 32px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;
+    }
+
+    .nav-spacer { width: 100%; height: 90px; flex-shrink: 0; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; height: 60px;
+      background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex; justify-content: space-around; align-items: center; z-index: 99999;
+    }
+    .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.62rem; cursor: pointer; width: 25%; }
+    .nav-btn.active { color: var(--gold); }
+
+    .loading-tag { text-align: center; color: var(--text-sub); font-size: 0.8rem; padding: 20px; }
+
+    .card-present-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95);
+      backdrop-filter: blur(16px); z-index: 20000; justify-content: center; align-items: center; cursor: pointer;
+    }
+    .card-present-overlay.active { display: flex; }
+    .card-present-wrapper {
+      width: 95vw; max-width: 410px; transition: transform 0.4s cubic-bezier(0.25, 1.3, 0.5, 1);
+      transform: rotate(0deg) scale(0.7); opacity: 0;
+    }
+    .card-present-overlay.active .card-present-wrapper { transform: rotate(90deg) scale(1.68); opacity: 1; }
+    .card-present-tip { position: absolute; bottom: 30px; color: var(--text-sub); font-size: 0.75rem; letter-spacing: 0.1em; pointer-events: none; z-index: 20001; }
+
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px); z-index: 25000; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .drawer-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .side-drawer {
+      position: fixed; top: 0; left: 0; width: 280px; height: 100%;
+      background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 26000; transform: translateX(-100%);
+      display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+      will-change: transform;
+    }
+    .side-drawer.animated { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    .side-drawer.open { transform: translateX(0); }
+
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+    .drawer-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.9rem; font-weight: bold; letter-spacing: 0.1em; }
+    .drawer-close-btn { background: none; border: none; color: var(--text-sub); font-size: 1.2rem; cursor: pointer; }
+
+    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .drawer-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-main); font-size: 0.8rem;
+      cursor: pointer; text-align: left; transition: background 0.2s ease; text-decoration: none; width: 100%;
+    }
+    .drawer-item:active { background: rgba(229,192,123,0.15); border-color: var(--gold); }
+  </style>
+</head>
+<body class="mypal-mode">
+
+  <!-- ドロワーメニュー -->
+  <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+  
+  <aside id="side-drawer" class="side-drawer">
+    <div>
+      <div class="drawer-header">
+        <span class="drawer-title">SETTINGS</span>
+        <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-menu-list">
+        <button class="drawer-item" onclick="toggleModal('palcard-edit-modal', true); closeDrawer();">PALCARD編集</button>
+        <button class="drawer-item" onclick="toggleModal('account-modal', true); closeDrawer();">アカウント・プロフ設定</button>
+        <a href="customize.html" class="drawer-item">デザイン着せ替え</a>
+      </div>
+    </div>
+    <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
+  </aside>
+
+  <div class="app-viewport">
+    
+    <!-- マイパル ページ -->
+    <div id="page-mypal" class="page active">
+
+      <!-- 名刺カード（3Dフリップ対応） -->
+      <div class="palcard-container" id="palcard-container" onclick="toggleCardFlip(event)">
+        <div class="palcard-flipper">
+          
+          <!-- 表面 -->
+          <div class="palcard" id="main-palcard">
+            <div class="palcard-brand">PALCARD</div>
+            <div class="palcard-body">
+              <div class="profile-info">
+                <div id="in-user-title" class="user-title-display">FOUNDER</div>
+                <div id="in-name" class="pet-name">MEL</div>
+                <div class="profile-fields">
+                  <div class="field-row"><span class="field-label">生年月日</span><div id="in-birth" class="field-value">2026.02.10</div></div>
+                  <div class="field-row"><span class="field-label">nickname</span><div id="in-nickname" class="field-value">メルちゃん</div></div>
+                  <div class="field-row"><span class="field-label">message</span><div id="in-owner" class="field-value">Rui</div></div>
+                  <div class="field-row"><span class="field-label">pallike</span><div id="in-pallike" class="field-value" style="color:var(--gold); font-weight:bold;">♡ 0</div></div>
+                </div>
+              </div>
+              
+              <div class="right-avatar-container">
+                <label class="avatar-wrapper" id="main-avatar-wrapper" onclick="event.stopPropagation()">
+                  <div class="avatar-inner"><img id="avatar-img" src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"></div>
+                  <input type="file" accept="image/*" onchange="previewImg(this, 'avatar-img')">
+                </label>
+
+                <div class="present-pet-name" id="present-pet-name-display" style="display:none;">MEL</div>
+              </div>
+            </div>
+
+            <div class="palcard-footer" id="main-palcard-footer">
+              <div class="footer-left-group">
+                <button class="icon-btn" onclick="event.stopPropagation(); presentCard();"><span>PALINK</span></button>
+                <label class="icon-btn" style="cursor:pointer;" onclick="event.stopPropagation()">
+                  <span>受け取る</span>
+                  <input type="file" accept="image/*" capture="environment" onchange="receiveNewCard(this)">
+                </label>
+              </div>
+              <div class="sns-links-container">
+                <a id="btn-sns-instagram" href="#" target="_blank" class="sns-btn" title="Instagram" onclick="event.stopPropagation()">📸</a>
+                <a id="btn-sns-x" href="#" target="_blank" class="sns-btn" title="X (Twitter)" onclick="event.stopPropagation()">𝕏</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 背面 -->
+          <div class="palcard palcard-back" id="back-palcard">
+            <div class="palcard-brand">PALCARD</div>
+            <div class="back-content">
+              <div>
+                <div class="back-owner-title">OWNER NAME</div>
+                <div class="back-owner-name" id="back-owner-display">Rui</div>
+              </div>
+              <div class="back-sns-list">
+                <a id="back-btn-instagram" href="#" target="_blank" class="back-sns-item inactive" onclick="event.stopPropagation()">📸Instagramを開く</a>
+                <a id="back-btn-x" href="#" target="_blank" class="back-sns-item inactive" onclick="event.stopPropagation()">𝕏 (Twitter) を開く</a>
+              </div>
+            </div>
+            <div style="text-align: center;">
+              <span class="back-flip-tip">もう一度タップして表面に戻る</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 9マス Grid -->
+      <div class="grid-container">
+        <script>
+          const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'PALMEL'];
+          gridLabels.forEach((lbl, i) => {
+            const isPalmelBox = (i === 8);
+            const labelHtml = (i === 2)
+              ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12">`
+              : lbl;
+
+            if (isPalmelBox) {
+              document.write(`
+                <div class="grid-item">
+                  <div class="grid-label">${labelHtml}</div>
+                  <div class="grid-number-box">
+                    <span class="styled-number">9</span>
+                  </div>
+                </div>`);
+            } else {
+              document.write(`
+                <div class="grid-item">
+                  <div class="grid-label">${labelHtml}</div>
+                  <label class="grid-image-box">
+                    <img id="g${i}">
+                    <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}')">
+                  </label>
+                </div>`);
+            }
+          });
+        </script>
+      </div>
+
+    </div>
+
+    <!-- アルバム ページ -->
+    <div id="page-album" class="page">
+      <div style="position: sticky; top: 0; z-index: 800; background: var(--bg-main); padding-bottom: 8px;">
+        <button class="action-btn-main" onclick="saveCurrentToAlbum()">現在の9マスをアルバムに保存する</button>
+      </div>
+      <div class="album-list-container" id="album-list-container"></div>
+    </div>
+
+    <!-- 交換した名刺（Exchange Cards） ページ -->
+    <div id="page-exchange-cards" class="page">
+      <div style="padding: 4px 0 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <h3 style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem; letter-spacing:0.05em;">EXCHANGED CARDS</h3>
+      </div>
+      <div id="exchange-cards-list">
+        <p style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding: 20px 0;">まだ交換した名刺がありません。「マイパル」の「名刺を受け取る」からお友達の名刺を追加してみましょう！</p>
+      </div>
+    </div>
+
+    <!-- みんなのパル ページ -->
+    <div id="page-feed" class="page">
+      <div style="position: sticky; top: 0; z-index: 800; background: var(--bg-main); padding-bottom: 8px;">
+        <button class="action-btn-main" onclick="openPostModal()">投稿する</button>
+      </div>
+
+      <div id="feed-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+      <div id="scroll-marker" class="loading-tag">パルを読み込み中...</div>
+      
+      <div class="nav-spacer"></div>
+    </div>
+
+  </div>
+
+  <!-- PALCARD編集モーダル -->
+  <div id="palcard-edit-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold);">PALCARD EDIT</h3>
+      <div style="margin-top:14px;">
+        <div class="form-group">
+          <label class="form-label">肩書 / タイトル (例: FOUNDER)</label>
+          <input type="text" id="edit-user-title" class="form-input" placeholder="肩書を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ペットの名前 (例: MEL)</label>
+          <input type="text" id="edit-name" class="form-input" placeholder="名前を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">生年月日 (例: 2026.02.10)</label>
+          <input type="text" id="edit-birth" class="form-input" placeholder="生年月日を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">nickname (例: メルちゃん)</label>
+          <input type="text" id="edit-nickname" class="form-input" placeholder="ニックネームを入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">message (例: こんにちは)</label>
+          <input type="text" id="edit-owner" class="form-input" placeholder="オーナー名を入力">
+        </div>
+      </div>
+      <button style="margin-top:16px; width:100%; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="savePalcardEdit()">保存する</button>
+    </div>
+  </div>
+
+  <!-- 投稿編集モーダル -->
+  <div id="post-edit-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold); margin-bottom: 12px;">NEW POST</h3>
+      
+      <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+        <button id="tab-btn-single" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); background: var(--gold); color: #000; font-weight: bold; font-size: 0.75rem; cursor: pointer;" onclick="switchPostType('single')">1マス投稿</button>
+        <button id="tab-btn-9grid" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--text-sub); font-weight: bold; font-size: 0.75rem; cursor: pointer;" onclick="switchPostType('9grid')">9マス投稿</button>
+      </div>
+
+      <div id="post-type-single">
+        <label class="single-media-box" style="display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 12px; border: 1px dashed rgba(229,192,123,0.4); background: rgba(0,0,0,0.3);">
+          <img id="single-preview-img" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+          <span id="single-preview-placeholder" style="font-size: 0.75rem; color: var(--text-sub);">＋ タップして画像を選ぶ</span>
+          <input type="file" accept="image/*" onchange="previewSingleImage(this)">
+        </label>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label">ひとこと文章 (15〜20文字程度)</label>
+          <input type="text" id="single-caption-input" class="form-input" placeholder="例：今日は日向ぼっこ日和でした！" maxlength="30">
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="action-btn-main" style="flex: 1;" onclick="submitSinglePost()">1マスを投稿する</button>
+          <button style="flex: 1; background:none; border:1px solid rgba(255,255,255,0.2); border-radius: 20px; color:var(--text-sub); cursor:pointer; font-size: 0.8rem;" onclick="toggleModal('post-edit-modal', false)">キャンセル</button>
+        </div>
+      </div>
+
+      <div id="post-type-9grid" style="display: none;">
+        <p style="font-size: 0.7rem; color: var(--text-sub); margin-bottom: 8px;">あなたの現在の9マスをそのまま投稿します。</p>
+        <div class="mini-grid-container" id="post-modal-9grid-preview" style="margin-bottom: 14px;"></div>
+        <div style="display: flex; gap: 8px;">
+          <button class="action-btn-main" style="flex: 1;" onclick="submit9GridPost()">9マスを投稿する</button>
+          <button style="flex: 1; background:none; border:1px solid rgba(255,255,255,0.2); border-radius: 20px; color:var(--text-sub); cursor:pointer; font-size: 0.8rem;" onclick="toggleModal('post-edit-modal', false)">キャンセル</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- アカウント・プロフ設定モーダル -->
+  <div id="account-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold);">ACCOUNT & PROFILE</h3>
+      <div style="margin-top:14px;">
+        <div class="form-group">
+          <label class="form-label">Instagram ID (例: username)</label>
+          <input type="text" id="acc-instagram" class="form-input" placeholder="ユーザー名を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">X (Twitter) ID (例: username)</label>
+          <input type="text" id="acc-x" class="form-input" placeholder="ユーザー名を入力">
+        </div>
+      </div>
+      <button style="margin-top:16px; width:100%; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="saveAccountSettings()">保存する</button>
+    </div>
+  </div>
+
+  <div id="user-profile-modal" class="user-profile-modal">
+    <div class="profile-modal-container">
+      <button class="close-modal-btn" onclick="closeUserProfile()">✕</button>
+      <div class="palcard" style="position: relative;">
+        <div class="palcard-brand">PALCARD</div>
+        <div class="palcard-body">
+          <div class="profile-info">
+            <div id="target-name" class="pet-name"></div>
+            <div class="profile-fields">
+              <div class="field-row"><span class="field-label">生年月日</span><div id="target-birth" class="field-value">2024.05.12</div></div>
+              <div class="field-row"><span class="field-label">ニックネーム</span><div id="target-nickname" class="field-value">ココちゃん</div></div>
+              <div class="field-row"><span class="field-label">オーナーネーム</span><div id="target-owner" class="field-value">Rui</div></div>
+              <div class="field-row"><span class="field-label">pallike</span><div id="target-pallike" class="field-value" style="color:var(--gold); font-weight:bold;">♡ 0</div></div>
+            </div>
+          </div>
+          <div class="right-avatar-container">
+            <div class="avatar-wrapper">
+              <div class="avatar-inner"><img id="target-avatar" src=""></div>
+            </div>
+          </div>
+        </div>
+        <div class="palcard-footer">
+          <button class="icon-btn" id="target-like-btn" onclick="incrementLike()"><span>♡ いいね！</span></button>
+        </div>
+      </div>
+      <div class="grid-container" id="target-grid-container"></div>
+      <div class="nav-spacer"></div>
+    </div>
+  </div>
+
+  <div id="card-present-modal" class="card-present-overlay" onclick="closePresentCard()">
+    <div class="card-present-wrapper" id="present-card-container"></div>
+    <div class="card-present-tip">タップして閉じる</div>
+  </div>
+
+  <!-- ボトムナビゲーション -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="btn-mypal" onclick="switchTab('mypal')"> MYPAL</button>
+    <button class="nav-btn" id="btn-album" onclick="switchTab('album')">ALBUM</button>
+    <button class="nav-btn" id="btn-exchange" onclick="switchTab('exchange')">PALRIUM</button>
+    <button class="nav-btn" id="btn-feed" onclick="switchTab('feed')">PALS</button>
+  </nav>
+
+  <script>
+    let palCount = 1;
+    const names = ['COCO', 'LUNA', 'ROKI', 'TORA', 'LEO', 'MUKU', 'CHIP', 'BELL'];
+    const ownerNames = ['Rui', 'Sota', 'Yuki', 'Aoi', 'Hina', 'Ken'];
+    const exchangedCardsList = []; 
+    const albumList = [];
+    const postDataStore = {};
+    let tempSingleImageBase64 = '';
+    let currentLikedPostId = null;
+
+    function toggleCardFlip(event) {
+      if (['INPUT', 'BUTTON', 'LABEL'].includes(event.target.tagName)) return;
+      const container = document.getElementById('palcard-container');
+      const footer = document.getElementById('main-palcard-footer');
+      container.classList.toggle('flipped');
+      
+      if (container.classList.contains('flipped')) {
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = 'flex';
+      }
+    }
+
+    function syncOwnerName(val) {
+      const displayEl = document.getElementById('back-owner-display');
+      if (displayEl) {
+        displayEl.innerText = val ? val : 'OWNER';
+      }
+    }
+
+    function getRandomAnimalImage() {
+      const types = ['dog', 'cat', 'bird', 'rabbit'];
+      const chosenType = types[Math.floor(Math.random() * types.length)];
+      
+      if (chosenType === 'dog') {
+        return [
+          'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&auto=format&fit=crop&q=80'
+        ][Math.floor(Math.random() * 2)];
+      } else if (chosenType === 'cat') {
+        return [
+          'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=400&auto=format&fit=crop&q=80'
+        ][Math.floor(Math.random() * 2)];
+      } else if (chosenType === 'rabbit') {
+        return 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&auto=format&fit=crop&q=80';
+      } else {
+        return 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&auto=format&fit=crop&q=80';
+      }
+    }
+
+    function applySavedCustomization() {
+      const saved = localStorage.getItem('parmel_custom_config');
+      if (!saved) return;
+
+      try {
+        const config = JSON.parse(saved);
+        const card = document.getElementById('main-palcard');
+        const backCard = document.getElementById('back-palcard');
+        const avatarWrapper = document.getElementById('main-avatar-wrapper');
+        const petName = document.getElementById('in-name');
+        const userTitleDisplay = document.getElementById('in-user-title');
+
+        if (card) {
+          card.className = 'palcard';
+          if (config.theme) card.classList.add(config.theme);
+        }
+        if (backCard) {
+          backCard.className = 'palcard palcard-back';
+          if (config.theme) backCard.classList.add(config.theme);
+        }
+
+        if (avatarWrapper) {
+          avatarWrapper.className = 'avatar-wrapper';
+          if (config.frame) avatarWrapper.classList.add(config.frame);
+        }
+
+        if (petName) {
+          if (config.font === 'Noto Sans JP') {
+            petName.style.fontFamily = `'Noto Sans JP', sans-serif`;
+            petName.style.fontWeight = '900';
+          } else if (config.font) {
+            petName.style.fontFamily = `'${config.font}', serif, sans-serif`;
+            petName.style.fontWeight = '700';
+          }
+        }
+
+        if (userTitleDisplay && config.title) {
+          userTitleDisplay.innerText = config.title;
+        }
+
+      } catch (e) {
+        console.error('カスタマイズ設定の読み込みに失敗しました:', e);
+      }
+    }
+
+    function syncCardName(val) {
+      const displayEl = document.getElementById('present-pet-name-display');
+      if (displayEl) {
+        displayEl.innerText = val;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', applySavedCustomization);
+    window.addEventListener('pageshow', applySavedCustomization);
+    window.addEventListener('storage', applySavedCustomization);
+
+    const drawer = document.getElementById('side-drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const DRAWER_WIDTH = 280;
+
+    let startX = 0;
+    let startY = 0;
+    let isTracking = false;
+    let isOpen = false;
+
+    function openDrawer() {
+      isOpen = true;
+      drawer.classList.add('animated');
+      drawer.style.transform = `translateX(0px)`;
+      drawerOverlay.classList.add('active');
+    }
+
+    function closeDrawer() {
+      isOpen = false;
+      drawer.classList.add('animated');
+      drawer.style.transform = `translateX(-100%)`;
+      drawerOverlay.classList.remove('active');
+    }
+
+    window.addEventListener('touchstart', (e) => {
+      if (['INPUT', 'BUTTON', 'LABEL', 'TEXTAREA'].includes(e.target.tagName)) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isTracking = true;
+      drawer.classList.remove('animated');
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isTracking) return;
+      const touchX = e.touches[0].clientX;
+      const touchY = e.touches[0].clientY;
+      const diffX = touchX - startX;
+      const diffY = Math.abs(touchY - startY);
+
+      if (diffY > Math.abs(diffX) && diffY > 10) {
+        isTracking = false;
+        return;
+      }
+
+      if (!isOpen) {
+        if (diffX > 0) {
+          let translateX = -DRAWER_WIDTH + diffX;
+          if (translateX > 0) translateX = 0;
+          drawer.style.transform = `translateX(${translateX}px)`;
+          drawerOverlay.style.opacity = Math.min(diffX / DRAWER_WIDTH, 1);
+          drawerOverlay.style.pointerEvents = 'auto';
+        }
+      } else {
+        if (diffX < 0) {
+          let translateX = diffX;
+          if (translateX < -DRAWER_WIDTH) translateX = -DRAWER_WIDTH;
+          drawer.style.transform = `translateX(${translateX}px)`;
+          drawerOverlay.style.opacity = Math.max(1 + (diffX / DRAWER_WIDTH), 0);
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (!isTracking) return;
+      isTracking = false;
+      const endX = e.changedTouches[0].clientX;
+      const diffX = endX - startX;
+
+      drawerOverlay.style.opacity = '';
+      drawerOverlay.style.pointerEvents = '';
+
+      if (!isOpen) {
+        if (diffX > 50) openDrawer();
+        else closeDrawer();
+      } else {
+        if (diffX < -50) closeDrawer();
+        else openDrawer();
+      }
+    }, { passive: true });
+
+    function savePalcardEdit() {
+      const title = document.getElementById('edit-user-title').value;
+      const name = document.getElementById('edit-name').value;
+      const birth = document.getElementById('edit-birth').value;
+      const nickname = document.getElementById('edit-nickname').value;
+      const owner = document.getElementById('edit-owner').value;
+
+      document.getElementById('in-user-title').innerText = title;
+      document.getElementById('in-name').innerText = name;
+      document.getElementById('in-birth').innerText = birth;
+      document.getElementById('in-nickname').innerText = nickname;
+      document.getElementById('in-owner').innerText = owner;
+
+      syncCardName(name);
+      syncOwnerName(owner);
+
+      toggleModal('palcard-edit-modal', false);
+      alert('PALCARDの情報を更新しました！');
+    }
+
+    function saveAccountSettings() {
+      const instaId = document.getElementById('acc-instagram').value.trim();
+      const xId = document.getElementById('acc-x').value.trim();
+      const btnInsta = document.getElementById('btn-sns-instagram');
+      const btnX = document.getElementById('btn-sns-x');
+      const backBtnInsta = document.getElementById('back-btn-instagram');
+      const backBtnX = document.getElementById('back-btn-x');
+
+      if (instaId) {
+        const url = `https://instagram.com/${instaId.replace(/^@/, '')}`;
+        btnInsta.href = url;
+        btnInsta.classList.add('active');
+        backBtnInsta.href = url;
+        backBtnInsta.classList.remove('inactive');
+      } else {
+        btnInsta.classList.remove('active');
+        backBtnInsta.classList.add('inactive');
+      }
+
+      if (xId) {
+        const url = `https://x.com/${xId.replace(/^@/, '')}`;
+        btnX.href = url;
+        btnX.classList.add('active');
+        backBtnX.href = url;
+        backBtnX.classList.remove('inactive');
+      } else {
+        btnX.classList.remove('active');
+        backBtnX.classList.add('inactive');
+      }
+
+      toggleModal('account-modal', false);
+      alert('アカウント情報を更新しました！');
+    }
+
+    function generatePalPost() {
+      const feed = document.getElementById('feed-container');
+      const postId = 'post_' + palCount + '_' + Date.now();
+      const rName = names[Math.floor(Math.random() * names.length)];
+      const rOwner = ownerNames[Math.floor(Math.random() * ownerNames.length)];
+      const avatarUrl = getRandomAnimalImage();
+      const isNineGrid = Math.random() > 0.5;
+
+      const userGridImgs = [];
+      for (let i = 0; i < 9; i++) {
+        userGridImgs.push(getRandomAnimalImage());
+      }
+
+      postDataStore[postId] = {
+        name: rName,
+        birth: '2025.04.10',
+        nickname: rName + 'ちゃん',
+        owner: rOwner,
+        pallike: Math.floor(Math.random() * 15),
+        avatar: avatarUrl,
+        gridImgs: userGridImgs,
+        singleImg: null,
+        caption: '',
+        customFreeTitle: 'FREE'
+      };
+
+      const card = document.createElement('div');
+      card.className = 'feed-post-card';
+      card.setAttribute('onclick', `openUserProfile('${postId}')`);
+
+      let mediaHtml = '';
+      if (isNineGrid) {
+        mediaHtml = `<div class="mini-grid-container">`;
+        for (let i = 0; i < 9; i++) {
+          if (i === 8) {
+            mediaHtml += `<div class="mini-grid-item" style="background:#1b2025; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Cinzel'; font-size:1rem; color:var(--gold); opacity:0.8;">9</span></div>`;
+          } else {
+            mediaHtml += `<div class="mini-grid-item"><img src="${userGridImgs[i]}" style="object-fit:cover;"></div>`;
+          }
+        }
+        mediaHtml += `</div>`;
+      } else {
+        const singleImg = getRandomAnimalImage();
+        mediaHtml = `<div class="single-media-box"><img src="${singleImg}"></div>`;
+      }
+
+      card.innerHTML = `
+        <div class="feed-header">
+          <div class="feed-avatar"><img src="${avatarUrl}"></div>
+          <div class="feed-user-info">
+            <div class="feed-pet-name">${rName}</div>
+            <div class="feed-title">Owner: ${rOwner}</div>
+          </div>
+        </div>
+        ${mediaHtml}
+      `;
+
+      feed.appendChild(card);
+      palCount++;
+    }
+
+    function openUserProfile(postId) {
+      const data = postDataStore[postId];
+      if(!data) return;
+      currentLikedPostId = postId;
+
+      document.getElementById('target-name').innerText = data.name;
+      document.getElementById('target-birth').innerText = data.birth;
+      document.getElementById('target-nickname').innerText = data.nickname;
+      document.getElementById('target-owner').innerText = data.owner;
+      document.getElementById('target-pallike').innerText = `♡ ${data.pallike}`;
+      document.getElementById('target-avatar').src = data.avatar;
+
+      const gridContainer = document.getElementById('target-grid-container');
+      gridContainer.innerHTML = '';
+      
+      gridLabels.forEach((lbl, i) => {
+        const isPalmelBox = (i === 8);
+        const displayLabel = (i === 2 && data.customFreeTitle) ? data.customFreeTitle : lbl;
+
+        if (isPalmelBox) {
+          gridContainer.innerHTML += `
+            <div class="grid-item">
+              <div class="grid-label">${displayLabel}</div>
+              <div class="grid-number-box">
+                <span class="styled-number">9</span>
+              </div>
+            </div>
+          `;
+        } else {
+          const imgSrc = data.gridImgs[i] || getRandomAnimalImage();
+          gridContainer.innerHTML += `
+            <div class="grid-item">
+              <div class="grid-label">${displayLabel}</div>
+              <div class="grid-image-box">
+                <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      document.getElementById('user-profile-modal').classList.add('active');
+    }
+
+    function incrementLike() {
+      if (!currentLikedPostId || !postDataStore[currentLikedPostId]) return;
+      const data = postDataStore[currentLikedPostId];
+      data.pallike += 1;
+      document.getElementById('target-pallike').innerText = `♡ ${data.pallike}`;
+      alert('いいね！しました！♡');
+    }
+
+    function closeUserProfile() {
+      document.getElementById('user-profile-modal').classList.remove('active');
+    }
+
+    function switchTab(tabName) {
+      toggleModal('post-edit-modal', false);
+      toggleModal('palcard-edit-modal', false);
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      if(tabName === 'mypal') {
+        document.body.classList.add('mypal-mode');
+        document.getElementById('page-mypal').classList.add('active');
+        document.getElementById('btn-mypal').classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      } else if(tabName === 'album') {
+        document.body.classList.add('mypal-mode');
+        document.getElementById('page-album').classList.add('active');
+        document.getElementById('btn-album').classList.add('active');
+        renderAlbumEntries();
+      } else if(tabName === 'exchange') {
+        document.body.classList.add('mypal-mode');
+        document.getElementById('page-exchange-cards').classList.add('active');
+        document.getElementById('btn-exchange').classList.add('active');
+        renderExchangedCards();
+      } else if(tabName === 'feed') {
+        document.body.classList.remove('mypal-mode');
+        document.getElementById('page-feed').classList.add('active');
+        document.getElementById('btn-feed').classList.add('active');
+        
+        const feed = document.getElementById('feed-container');
+        if (feed.children.length === 0) {
+          generatePalPost();
+          generatePalPost();
+        }
+      }
+    }
+
+    function toggleModal(id, show) {
+      const el = document.getElementById(id);
+      if (show) {
+        if(id === 'palcard-edit-modal') {
+          document.getElementById('edit-user-title').value = document.getElementById('in-user-title').innerText;
+          document.getElementById('edit-name').value = document.getElementById('in-name').innerText;
+          document.getElementById('edit-birth').value = document.getElementById('in-birth').innerText;
+          document.getElementById('edit-nickname').value = document.getElementById('in-nickname').innerText;
+          document.getElementById('edit-owner').value = document.getElementById('in-owner').innerText;
+        }
+        if(id === 'post-edit-modal') {
+          switchPostType('single');
+          const currentImgs = getMyGridImages();
+          const previewContainer = document.getElementById('post-modal-9grid-preview');
+          previewContainer.innerHTML = '';
+          for (let i = 0; i < 9; i++) {
+            if (i === 8) {
+              previewContainer.innerHTML += `<div class="mini-grid-item" style="background:#1b2025; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Cinzel'; font-size:1rem; color:var(--gold); opacity:0.8;">9</span></div>`;
+            } else {
+              const src = currentImgs[i];
+              const imgHtml = src ? `<img src="${src}" style="object-fit:cover;">` : `<div style="width:100%; height:100%; background:#202428;"></div>`;
+              previewContainer.innerHTML += `<div class="mini-grid-item">${imgHtml}</div>`;
+            }
+          }
+          tempSingleImageBase64 = '';
+          document.getElementById('single-preview-img').src = '';
+          document.getElementById('single-preview-img').style.display = 'none';
+          document.getElementById('single-preview-placeholder').style.display = 'block';
+          document.getElementById('single-caption-input').value = '';
+        }
+        el.style.display = 'flex'; 
+        requestAnimationFrame(() => el.classList.add('active'));
+      } else { 
+        el.classList.remove('active'); 
+        setTimeout(() => { 
+          if (!el.classList.contains('active')) el.style.display = 'none'; 
+        }, 200); 
+      }
+    }
+
+    function switchPostType(type) {
+      const btn9 = document.getElementById('tab-btn-9grid');
+      const btnSingle = document.getElementById('tab-btn-single');
+      const view9 = document.getElementById('post-type-9grid');
+      const viewSingle = document.getElementById('post-type-single');
+
+      if (type === 'single') {
+        btnSingle.style.background = 'var(--gold)';
+        btnSingle.style.borderColor = 'var(--gold)';
+        btnSingle.style.color = '#000';
+        btn9.style.background = 'transparent';
+        btn9.style.borderColor = 'rgba(255,255,255,0.2)';
+        btn9.style.color = 'var(--text-sub)';
+        viewSingle.style.display = 'block';
+        view9.style.display = 'none';
+      } else {
+        btn9.style.background = 'var(--gold)';
+        btn9.style.borderColor = 'var(--gold)';
+        btn9.style.color = '#000';
+        btnSingle.style.background = 'transparent';
+        btnSingle.style.borderColor = 'rgba(255,255,255,0.2)';
+        btnSingle.style.color = 'var(--text-sub)';
+        view9.style.display = 'block';
+        viewSingle.style.display = 'none';
+      }
+    }
+
+    function previewImg(input, targetId) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          document.getElementById(targetId).src = e.target.result;
+          const cloneAvatar = document.querySelector('#present-card-container #avatar-img');
+          if(cloneAvatar) cloneAvatar.src = e.target.result;
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function previewGrid(input, imgId) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          const img = document.getElementById(imgId);
+          img.src = e.target.result;
+          img.style.display = 'block';
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && document.getElementById('page-feed').classList.contains('active')) {
+        generatePalPost();
+      }
+    }, { rootMargin: '200px' });
+
+    observer.observe(document.getElementById('scroll-marker'));
+
+    function getMyGridImages() {
+      const imgs = [];
+      for (let i = 0; i < 8; i++) {
+        const imgEl = document.getElementById(`g${i}`);
+        imgs.push((imgEl && imgEl.src) ? imgEl.src : '');
+      }
+      imgs.push('');
+      return imgs;
+    }
+
+    function saveCurrentToAlbum() {
+      const name = document.getElementById('in-name').innerText;
+      const owner = document.getElementById('in-owner').innerText;
+      const avatarSrc = document.getElementById('avatar-img').src;
+      const myGridImgs = getMyGridImages();
+      const customFreeInput = document.getElementById('custom-free-label');
+      const customFreeTitle = customFreeInput ? customFreeInput.value : 'FREE';
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      albumList.unshift({
+        date: dateStr,
+        name: name,
+        owner: owner,
+        avatar: avatarSrc,
+        gridImgs: myGridImgs,
+        customFreeTitle: customFreeTitle
+      });
+
+      renderAlbumEntries();
+      alert('現在の9マスをアルバムに保存しました！');
+    }
+
+    function deleteAlbumEntry(index) {
+      if (confirm('このアルバムの記録を削除してもよろしいですか？')) {
+        albumList.splice(index, 1);
+        renderAlbumEntries();
+      }
+    }
+
+    function renderAlbumEntries() {
+      const container = document.getElementById('album-list-container');
+      if (albumList.length === 0) {
+        container.innerHTML = `<p style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding: 20px 0;">まだ保存されたアルバムがありません。「現在の9マスをアルバムに保存する」ボタンを押して記録を残してみましょう！</p>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      albumList.forEach((entry, index) => {
+        let miniGridHtml = `<div class="mini-grid-container">`;
+        for (let i = 0; i < 9; i++) {
+          if (i === 8) {
+            miniGridHtml += `<div class="mini-grid-item" style="background:#1b2025; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Cinzel'; font-size:1rem; color:var(--gold); opacity:0.8;">9</span></div>`;
+          } else {
+            const src = entry.gridImgs[i] || '';
+            const imgHtml = src ? `<img src="${src}" style="object-fit:cover;">` : `<div style="width:100%; height:100%; background:#202428;"></div>`;
+            miniGridHtml += `<div class="mini-grid-item">${imgHtml}</div>`;
+          }
+        }
+        miniGridHtml += `</div>`;
+
+        const entryCard = document.createElement('div');
+        entryCard.className = 'album-entry-card';
+        entryCard.innerHTML = `
+          <button class="album-delete-btn" onclick="deleteAlbumEntry(${index})" title="削除">✕</button>
+          <div class="album-entry-header">
+            <span>保存日: ${entry.date}</span>
+            <span style="color:var(--gold); font-family:'Cinzel'; font-weight:bold;">${entry.name}</span>
+          </div>
+          ${miniGridHtml}
+        `;
+        container.appendChild(entryCard);
+      });
+    }
+
+    function receiveNewCard(input) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          const rName = names[Math.floor(Math.random() * names.length)];
+          const rOwner = ownerNames[Math.floor(Math.random() * ownerNames.length)];
+          
+          exchangedCardsList.push({
+            name: rName,
+            birth: '2025.06.15',
+            nickname: rName + 'ちゃん',
+            owner: rOwner,
+            pallike: Math.floor(Math.random() * 10),
+            avatar: e.target.result
+          });
+
+          alert('新しい名刺を受け取りました！下部メニューの「名刺/9マス」から確認できます。');
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function renderExchangedCards() {
+      const listContainer = document.getElementById('exchange-cards-list');
+      if (exchangedCardsList.length === 0) {
+        listContainer.innerHTML = `<p style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding: 20px 0;">まだ交換した名刺がありません。「マイパル」の「名刺を受け取る」からお友達の名刺を追加してみましょう！</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = '';
+      exchangedCardsList.forEach((cardData) => {
+        const cardHtml = document.createElement('div');
+        cardHtml.className = 'palcard';
+        cardHtml.style.marginBottom = '12px';
+        cardHtml.style.position = 'relative';
+        cardHtml.innerHTML = `
+          <div class="palcard-brand">PALCARD</div>
+          <div class="palcard-body">
+            <div class="profile-info">
+              <div class="pet-name" style="font-size: 1.8rem; margin-bottom: 6px;">${cardData.name}</div>
+              <div class="profile-fields">
+                <div class="field-row"><span class="field-label">生年月日</span><div class="field-value">${cardData.birth}</div></div>
+                <div class="field-row"><span class="field-label">ニックネーム</span><div class="field-value">${cardData.nickname}</div></div>
+                <div class="field-row"><span class="field-label">オーナーネーム</span><div class="field-value">${cardData.owner}</div></div>
+                <div class="field-row"><span class="field-label">pallike</span><div class="field-value" style="color:var(--gold); font-weight:bold;">♡ ${cardData.pallike}</div></div>
+              </div>
+            </div>
+            <div class="right-avatar-container">
+              <div class="avatar-wrapper">
+                <div class="avatar-inner"><img src="${cardData.avatar}"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(cardHtml);
+      });
+    }
+
+    function openPostModal() {
+      toggleModal('post-edit-modal', true);
+    }
+
+    function previewSingleImage(input) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          tempSingleImageBase64 = e.target.result;
+          const imgEl = document.getElementById('single-preview-img');
+          imgEl.src = tempSingleImageBase64;
+          imgEl.style.display = 'block';
+          document.getElementById('single-preview-placeholder').style.display = 'none';
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function submit9GridPost() {
+      const myGridImgs = getMyGridImages();
+      const name = document.getElementById('in-name').innerText;
+      const birth = document.getElementById('in-birth').innerText;
+      const nickname = document.getElementById('in-nickname').innerText;
+      const owner = document.getElementById('in-owner').innerText;
+      const avatarSrc = document.getElementById('avatar-img').src;
+      const customFreeInput = document.getElementById('custom-free-label');
+      const customFreeTitle = customFreeInput ? customFreeInput.value : 'FREE';
+      const postId = 'post_my_9grid_' + Date.now();
+
+      postDataStore[postId] = {
+        name: name,
+        birth: birth,
+        nickname: nickname,
+        owner: owner,
+        pallike: 0,
+        avatar: avatarSrc,
+        gridImgs: myGridImgs,
+        singleImg: null,
+        caption: '',
+        customFreeTitle: customFreeTitle
+      };
+
+      const feed = document.getElementById('feed-container');
+      const card = document.createElement('div');
+      card.className = 'feed-post-card';
+      card.style.borderColor = 'var(--gold)';
+      card.setAttribute('onclick', `openUserProfile('${postId}')`);
+
+      let miniGridHtml = `<div class="mini-grid-container">`;
+      for (let i = 0; i < 9; i++) {
+        if (i === 8) {
+          miniGridHtml += `<div class="mini-grid-item" style="background:#1b2025; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Cinzel'; font-size:1rem; color:var(--gold); opacity:0.8;">9</span></div>`;
+        } else {
+          const src = myGridImgs[i] || getRandomAnimalImage();
+          miniGridHtml += `<div class="mini-grid-item"><img src="${src}" style="object-fit:cover;"></div>`;
+        }
+      }
+      miniGridHtml += `</div>`;
+
+      card.innerHTML = `
+        <div class="feed-header">
+          <div class="feed-avatar"><img src="${avatarSrc}"></div>
+          <div class="feed-user-info">
+            <div class="feed-pet-name">${name}</div>
+            <div class="feed-title">Owner: ${owner}</div>
+          </div>
+        </div>
+        ${miniGridHtml}
+      `;
+
+      feed.prepend(card);
+      toggleModal('post-edit-modal', false);
+      switchTab('feed');
+      alert('「みんなのパル」に9マスを投稿しました！');
+    }
+
+    function submitSinglePost() {
+      if (!tempSingleImageBase64) {
+        alert('画像を選択してください。');
+        return;
+      }
+
+      const captionText = document.getElementById('single-caption-input').value.trim();
+      const name = document.getElementById('in-name').innerText;
+      const birth = document.getElementById('in-birth').innerText;
+      const nickname = document.getElementById('in-nickname').innerText;
+      const owner = document.getElementById('in-owner').innerText;
+      const avatarSrc = document.getElementById('avatar-img').src;
+      const postId = 'post_my_single_' + Date.now();
+
+      postDataStore[postId] = {
+        name: name,
+        birth: birth,
+        nickname: nickname,
+        owner: owner,
+        pallike: 0,
+        avatar: avatarSrc,
+        gridImgs: [],
+        singleImg: tempSingleImageBase64,
+        caption: captionText,
+        customFreeTitle: 'FREE'
+      };
+
+      const feed = document.getElementById('feed-container');
+      const card = document.createElement('div');
+      card.className = 'feed-post-card';
+      card.style.borderColor = 'var(--gold)';
+      card.setAttribute('onclick', `openUserProfile('${postId}')`);
+
+      const captionHtml = captionText ? `<div class="feed-single-caption">${captionText}</div>` : '';
+
+      card.innerHTML = `
+        <div class="feed-header">
+          <div class="feed-avatar"><img src="${avatarSrc}"></div>
+          <div class="feed-user-info">
+            <div class="feed-pet-name">${name}</div>
+            <div class="feed-title">Owner: ${owner}</div>
+          </div>
+        </div>
+        <div class="single-media-box"><img src="${tempSingleImageBase64}"></div>
+        ${captionHtml}
+      `;
+      feed.prepend(card);
+      toggleModal('post-edit-modal', false);
+      switchTab('feed');
+      alert('Upload successful!');
+    }
+
+    function presentCard() {
+      const cardSrc = document.getElementById('main-palcard');
+      const clone = cardSrc.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.querySelectorAll('input[type="file"]').forEach(input => input.remove());
+      clone.classList.add('is-presented');
+
+      const currentNameValue = document.getElementById('in-name').innerText;
+      const clonePresentNames = clone.querySelectorAll('.present-pet-name');
+      clonePresentNames.forEach(el => {
+        el.innerText = currentNameValue;
+        el.style.display = 'block';
+      });
+
+      const cloneAvatar = clone.querySelector('#avatar-img');
+      const mainAvatar = document.getElementById('avatar-img');
+      if(cloneAvatar && mainAvatar) {
+        cloneAvatar.src = mainAvatar.src;
+      }
+
+      const container = document.getElementById('present-card-container');
+      container.innerHTML = '';
+      container.appendChild(clone);
+
+      document.getElementById('card-present-modal').classList.add('active');
+    }
+
+    function closePresentCard() {
+      document.getElementById('card-present-modal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
