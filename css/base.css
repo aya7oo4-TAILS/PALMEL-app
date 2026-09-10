@@ -183,18 +183,21 @@ body.mypal-mode {
   margin-top: 10px;
 }
 
+
+/* 肩書き */
+
 .user-title-input {
   font-size: 0.58rem;
   color: var(--gold);
-  background: transparent;
-  border: none;
   padding: 0;
-  outline: none;
   font-weight: 500;
   margin-bottom: 2px;
   width: fit-content;
   letter-spacing: 0.05em;
 }
+
+
+/* ペット名 */
 
 .pet-name {
   font-family: 'Cinzel', serif;
@@ -203,11 +206,11 @@ body.mypal-mode {
   margin-bottom: 6px;
   font-weight: 700;
   color: #fff;
-  border: none;
-  background: transparent;
-  outline: none;
   letter-spacing: 0.02em;
 }
+
+
+/* プロフィール項目 */
 
 .profile-fields {
   display: flex;
@@ -234,7 +237,6 @@ body.mypal-mode {
   border: none;
   color: var(--text-main);
   font-size: 0.6rem;
-  outline: none;
   width: 100%;
   font-weight: 500;
 }
@@ -426,6 +428,9 @@ body.mypal-mode {
   padding: 10px 0 20px;
 }
 
+
+/* MESSAGE */
+
 .back-owner-title {
   font-size: 0.55rem;
   letter-spacing: 0.2em;
@@ -438,6 +443,11 @@ body.mypal-mode {
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 0.05em;
+
+  max-width: 280px;
+  line-height: 1.5;
+
+  word-break: break-word;
 }
 
 .back-sns-list {
@@ -1037,6 +1047,8 @@ input[type="file"] {
   cursor: pointer;
 
   width: 25%;
+
+  text-decoration: none;
 }
 
 .nav-btn.active {
