@@ -224,7 +224,7 @@
     .back-sns-item.inactive { opacity: 0.4; pointer-events: none; }
     .back-flip-tip { font-size: 0.48rem; color: var(--text-sub); letter-spacing: 0.1em; opacity: 0.7; }
 
-    /* プレゼン拡大時の特殊スタイル */
+    /* プレゼン拡大時のスタイル（180度回転・横向き全画面表示） */
     .card-present-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98);
       backdrop-filter: blur(20px); z-index: 20000; justify-content: center; align-items: center; cursor: pointer;
@@ -238,64 +238,62 @@
       justify-content: center;
       align-items: center;
       transition: transform 0.4s cubic-bezier(0.25, 1.3, 0.5, 1);
-      transform: rotate(90deg) scale(1); opacity: 0;
+      transform: rotate(90deg) scale(0.9); opacity: 0;
     }
     .card-present-overlay.active .card-present-wrapper { 
       transform: rotate(90deg) scale(1); 
       opacity: 1; 
     }
 
-    /* 「タップして閉じる」文言 */
-    .card-present-tip { position: absolute; bottom: 20px; color: var(--text-sub); font-size: 0.65rem; letter-spacing: 0.1em; pointer-events: none; z-index: 20001; }
+    /* 「タップして閉じる」文言（回転しても見やすい位置に固定） */
+    .card-present-tip { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: var(--text-sub); font-size: 0.65rem; letter-spacing: 0.1em; pointer-events: none; z-index: 20001; }
 
     .palcard.is-presented {
       position: relative !important;
       inset: auto !important;
-      width: 100vh !important;
-      height: 100vw!important;
-      aspect-ratio: auto!important;
+      width: 82vh !important;
+      height: auto !important;
       max-width: none !important;
       max-height: none !important;
       aspect-ratio: 1.55 / 1 !important;
-      padding: 32px 48px !important;
-      border-radius: 36px !important;
-      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+      padding: 18px 24px !important;
+      border-radius: 24px !important;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
     }
     .palcard.is-presented .profile-fields,
     .palcard.is-presented .palcard-footer { display: none !important; }
     
-    /* 90度回転されたPALCARDの「PALCARD」ロゴの配置 */
-    .palcard.is-presented .palcard-brand { font-size: 1.4rem !important; letter-spacing: 0.6em !important; display: block !important; margin-bottom: 2px !important; margin-top: -10px !important; }
+    .palcard.is-presented .palcard-brand { font-size: 0.75rem !important; letter-spacing: 0.35em !important; display: block !important; margin-bottom: 2px !important; margin-top: 0 !important; }
     
-    .palcard.is-presented .palcard-body { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; height: calc(100% - 20px) !important; gap: 24px !important; margin-top: 0 !important; }
+    .palcard.is-presented .palcard-body { display: flex !important; flex-direction: row !important; align-items: flex-start !important; justify-content: space-between !important; height: auto !important; gap: 12px !important; margin-top: 10px !important; }
     
-    /* 称号は非表示 */
     .palcard.is-presented .user-title-display { display: none !important; }
     
-    /* === 90度回転画面：左側（QRコード配置エリア） === */
+    /* 左側（QRコード配置エリア） - 上部に高さを揃えるための調整と少し下へのズレ */
     .palcard.is-presented .profile-info { 
-      flex: 1.2 !important; 
+      flex: 1 !important; 
       display: flex !important; 
       flex-direction: column !important; 
       align-items: center !important; 
-      justify-content: center !important; 
-      height: 100% !important; 
-      margin-top: 0 !important; 
+      justify-content: flex-start !important; 
+      height: auto !important; 
+      margin-top: 24px !important; /* QRコード全体を少し下に下げる */
       padding: 0 !important; 
     }
     
-    /* 大きなQRコードを囲む四角い枠（極限まで拡大） */
     .palcard.is-presented .qr-frame-box {
-      width: min(62vh, 62vw) !important;
-      height: min(62vh, 62vw) !important;
+      width: 30vh !important;
+      height: 30vh !important;
+      max-width: 195px !important;
+      max-height: 195px !important;
       background: #ffffff !important;
-      border: 6px solid var(--gold) !important;
-      border-radius: 24px !important;
+      border: 4px solid var(--gold) !important;
+      border-radius: 16px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      padding: 12px !important;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.7) !important;
+      padding: 10px !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7) !important;
     }
     .palcard.is-presented .qr-frame-box img {
       width: 100% !important;
@@ -303,26 +301,33 @@
       object-fit: contain !important;
     }
 
-    /* === 90度回転画面：右側（アイコン＆名前エリア） === */
+    /* 右側（アイコン＆名前エリア） - アイコンをさらに大きく拡大し、QRコードと上部の高さを揃える */
     .palcard.is-presented .right-avatar-container { 
-      flex: 0.8 !important; 
+      flex: 1 !important; 
       width: auto !important; 
-      height: 100% !important; 
-      margin-top: 0 !important; 
+      height: auto !important; 
+      margin-top: 4px !important; /* アイコン上部を基準位置に合わせるためマージンを調整 */
       display: flex !important; 
       flex-direction: column !important; 
       align-items: center !important; 
-      justify-content: center !important; 
+      justify-content: flex-start !important; 
       padding: 0 !important; 
       gap: 10px !important; 
     }
     
-    /* 丸いアイコンのサイズ（限界まで拡大：min(52vh, 52vw)） */
-    .palcard.is-presented .right-avatar-container .avatar-wrapper { width: min(52vh, 52vw) !important; height: min(52vh, 52vw) !important; border-radius: 50% !important; margin: 0 !important; flex-shrink: 0 !important; display: block !important; }
+    .palcard.is-presented .right-avatar-container .avatar-wrapper { 
+      width: 32vh !important; /* アイコンをさらに拡大 */
+      height: 32vh !important; 
+      max-width: 210px !important; 
+      max-height: 210px !important; 
+      border-radius: 50% !important; 
+      margin: 0 !important; 
+      flex-shrink: 0 !important; 
+      display: block !important; 
+    }
     .palcard.is-presented .right-avatar-container .avatar-inner { border-radius: 50% !important; }
     
-    /* 名前（MEL）のサイズ（バランスよく調整） */
-    .palcard.is-presented .present-pet-name { display: block !important; font-family: 'Cinzel', serif; font-size: clamp(2.4rem, 5.5vw, 4.2rem) !important; margin: 0 !important; text-align: center !important; line-height: 1.0 !important; color: #fff; font-weight: 700; letter-spacing: 0.05em; }
+    .palcard.is-presented .present-pet-name { display: block !important; font-family: 'Cinzel', serif; font-size: 2.3rem !important; margin: 0 !important; text-align: center !important; line-height: 1.0 !important; color: #fff; font-weight: 700; letter-spacing: 0.05em; }
     .palcard.is-presented .pet-name { display: none !important; }
 
     /* 9マス Grid */
@@ -612,7 +617,7 @@
     </div>
   </div>
 
-  <!-- PALINK拡大表示用モーダル -->
+  <!-- PALINK拡大表示用モーダル（90度回転表示） -->
   <div id="card-present-modal" class="card-present-overlay" onclick="closePresentCard()">
     <div class="card-present-wrapper" id="present-card-container"></div>
     <div class="card-present-tip">タップして閉じる</div>
@@ -834,7 +839,6 @@
       const mainAvatar = document.getElementById('avatar-img');
       if(cloneAvatar && mainAvatar) cloneAvatar.src = mainAvatar.src;
 
-      // 拡大時の左側（プロフィール情報エリア）を大きなQRコード表示用に置換
       const profileInfoEl = clone.querySelector('.profile-info');
       if (profileInfoEl) {
         profileInfoEl.innerHTML = `
@@ -848,7 +852,6 @@
       container.innerHTML = '';
       container.appendChild(clone);
 
-      // PALINK表示時にボトムナビを非表示にする
       const bottomNav = document.querySelector('.bottom-nav');
       if (bottomNav) {
         bottomNav.style.opacity = '0';
@@ -861,7 +864,6 @@
     function closePresentCard() {
       document.getElementById('card-present-modal').classList.remove('active');
 
-      // モーダルが閉じたときにボトムナビを復元する
       const bottomNav = document.querySelector('.bottom-nav');
       if (bottomNav) {
         bottomNav.style.opacity = '1';
