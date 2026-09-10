@@ -1,216 +1,740 @@
-const AppState = {
-  profile: { petName: "", userTitle: "FOUNDER", birth: "", nickname: "", message: "", instagram: "", x: "", pallike: 0 },
-  customFreeLabel: "FREE",
-  images: { avatar: "", g0: "", g1: "", g2: "", g3: "", g4: "", g5: "", g6: "", g7: "" }
-};
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-const STORAGE_KEY = "palmel_app_data_v1";
+  <title>PALMEL</title>
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadData();
-  renderUI();
-  
-  const freeLabelInput = document.getElementById("custom-free-label");
-  if (freeLabelInput) {
-    freeLabelInput.addEventListener("input", (e) => {
-      AppState.customFreeLabel = e.target.value;
-      saveData();
-    });
-  }
+  <link rel="stylesheet" href="css/base.css">
 
-  const overlay = document.getElementById("drawer-overlay");
-  if (overlay) overlay.addEventListener("click", closeDrawer);
-});
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.profile) AppState.profile = { ...AppState.profile, ...parsed.profile };
-      if (parsed.customFreeLabel) AppState.customFreeLabel = parsed.customFreeLabel;
-      if (parsed.images) AppState.images = { ...AppState.images, ...parsed.images };
-    }
-  } catch (e) {
-    console.error(e);
-  }
-}
+<body>
 
-function saveData() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(AppState));
-  } catch (e) {
-    console.error(e);
-  }
-}
+  <!-- =========================
+       サイドメニュー
+  ========================== -->
 
-function renderUI() {
-  document.getElementById("in-user-title").textContent = AppState.profile.userTitle || "FOUNDER";
-  
-  const nameEl = document.getElementById("in-name");
-  nameEl.textContent = AppState.profile.petName || "プロフ設定から入力";
-  nameEl.style.color = AppState.profile.petName ? "" : "#999";
+  <div id="drawer-overlay" class="drawer-overlay"></div>
 
-  const birthEl = document.getElementById("in-birth");
-  birthEl.textContent = AppState.profile.birth || "プロフ設定から入力";
-  birthEl.style.color = AppState.profile.birth ? "" : "#999";
+  <aside id="side-drawer" class="side-drawer">
 
-  const nicknameEl = document.getElementById("in-nickname");
-  nicknameEl.textContent = AppState.profile.nickname || "プロフ設定から入力";
-  nicknameEl.style.color = AppState.profile.nickname ? "" : "#999";
+    <div>
+      <div class="drawer-header">
+        <span class="drawer-title">SETTINGS</span>
 
-  document.getElementById("in-pallike").textContent = `♡ ${AppState.profile.pallike || 0}`;
+        <button
+          class="drawer-close-btn"
+          onclick="closeDrawer()">
+          ✕
+        </button>
+      </div>
 
-  const presentNameDisplay = document.getElementById("present-pet-name-display");
-  if (AppState.profile.petName) {
-    presentNameDisplay.textContent = AppState.profile.petName;
-    presentNameDisplay.style.display = "block";
-  } else {
-    presentNameDisplay.style.display = "none";
-  }
+      <div class="drawer-menu-list">
 
-  const backMsgEl = document.getElementById("back-message-display");
-  backMsgEl.textContent = AppState.profile.message || "プロフ設定から入力";
-  backMsgEl.style.color = AppState.profile.message ? "" : "#999";
+        <button
+          class="drawer-item"
+          onclick="openAccountSettings()">
+          👤 プロフ設定
+        </button>
 
-  const avatarImg = document.getElementById("avatar-img");
-  if (AppState.images.avatar) {
-    avatarImg.src = AppState.images.avatar;
-    avatarImg.style.display = "block";
-  } else {
-    avatarImg.src = "";
-    avatarImg.style.display = "none";
-  }
+        <a
+          href="customize.html"
+          class="drawer-item">
+          🎨 デザイン着せ替え
+        </a>
 
-  for (let i = 0; i < 8; i++) {
-    const imgEl = document.getElementById(`g${i}`);
-    const key = `g${i}`;
-    if (AppState.images[key]) {
-      imgEl.src = AppState.images[key];
-      imgEl.style.display = "block";
-    } else {
-      imgEl.src = "";
-      imgEl.style.display = "none";
-    }
-  }
+      </div>
+    </div>
 
-  const freeLabelInput = document.getElementById("custom-free-label");
-  if (freeLabelInput) freeLabelInput.value = AppState.customFreeLabel;
+    <button
+      class="drawer-item drawer-logout"
+      onclick="logout()">
+      🚪 ログアウト
+    </button>
 
-  updateSNSLink("btn-sns-instagram", "back-btn-instagram", AppState.profile.instagram, "https://instagram.com/", "Instagramを開く", "📸");
-  updateSNSLink("btn-sns-x", "back-btn-x", AppState.profile.x, "https://twitter.com/", "𝕏 (Twitter) を開く", "𝕏");
-}
+  </aside>
 
-function updateSNSLink(frontBtnId, backBtnId, username, baseUrl, backLabelText, frontIconText) {
-  const frontBtn = document.getElementById(frontBtnId);
-  const backBtn = document.getElementById(backBtnId);
 
-  if (username && username.trim() !== "") {
-    const url = `${baseUrl}${username.replace(/^@/, "").trim()}`;
-    if (frontBtn) { frontBtn.href = url; frontBtn.classList.remove("inactive"); frontBtn.style.opacity = "1"; }
-    if (backBtn) { backBtn.href = url; backBtn.classList.remove("inactive"); backBtn.textContent = `${frontIconText} ${backLabelText}`; }
-  } else {
-    if (frontBtn) { frontBtn.href = "#"; frontBtn.classList.add("inactive"); frontBtn.style.opacity = "0.4"; }
-    if (backBtn) { backBtn.href = "#"; backBtn.classList.add("inactive"); backBtn.textContent = backLabelText; }
-  }
-}
+  <!-- =========================
+       PALMEL HOME
+  ========================== -->
 
-function toggleCardFlip(event) {
-  if (event.target.closest("button, label, a, input")) return;
-  document.querySelector(".palcard-flipper")?.classList.toggle("flipped");
-}
+  <main class="app-viewport">
 
-function previewImg(input, targetImgId) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      AppState.images.avatar = e.target.result;
-      const imgEl = document.getElementById(targetImgId);
-      imgEl.src = e.target.result;
-      imgEl.style.display = "block";
-      saveData();
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
+    <section id="page-mypal" class="page active">
 
-function previewGrid(input, targetImgId) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      AppState.images[targetImgId] = e.target.result;
-      const imgEl = document.getElementById(targetImgId);
-      imgEl.src = e.target.result;
-      imgEl.style.display = "block";
-      saveData();
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
+      <!-- =====================
+           PALCARD
+      ====================== -->
 
-function openDrawer() {
-  document.getElementById("side-drawer")?.classList.add("open");
-  document.getElementById("drawer-overlay")?.classList.add("open");
-}
+      <div
+        class="palcard-container"
+        id="palcard-container"
+        onclick="toggleCardFlip(event)">
 
-function closeDrawer() {
-  document.getElementById("side-drawer")?.classList.remove("open");
-  document.getElementById("drawer-overlay")?.classList.remove("open");
-}
+        <div class="palcard-flipper">
 
-function openAccountSettings() {
-  closeDrawer();
-  document.getElementById("acc-pet-name").value = AppState.profile.petName || "";
-  document.getElementById("acc-user-title").value = AppState.profile.userTitle || "";
-  document.getElementById("acc-birth").value = AppState.profile.birth || "";
-  document.getElementById("acc-nickname").value = AppState.profile.nickname || "";
-  document.getElementById("acc-message").value = AppState.profile.message || "";
-  document.getElementById("acc-instagram").value = AppState.profile.instagram || "";
-  document.getElementById("acc-x").value = AppState.profile.x || "";
 
-  document.getElementById("account-modal")?.classList.add("open");
-}
+          <!-- ===== 表面 ===== -->
 
-function saveAccountSettings() {
-  AppState.profile.petName = document.getElementById("acc-pet-name").value.trim();
-  AppState.profile.userTitle = document.getElementById("acc-user-title").value.trim() || "FOUNDER";
-  AppState.profile.birth = document.getElementById("acc-birth").value.trim();
-  AppState.profile.nickname = document.getElementById("acc-nickname").value.trim();
-  AppState.profile.message = document.getElementById("acc-message").value.trim();
-  AppState.profile.instagram = document.getElementById("acc-instagram").value.trim();
-  AppState.profile.x = document.getElementById("acc-x").value.trim();
+          <div class="palcard" id="main-palcard">
 
-  saveData();
-  renderUI();
-  document.getElementById("account-modal")?.classList.remove("open");
-}
+            <div class="palcard-brand">
+              PALCARD
+            </div>
 
-function presentCard() {
-  const container = document.getElementById("present-card-container");
-  const mainCard = document.getElementById("main-palcard");
-  if (container && mainCard) {
-    container.innerHTML = "";
-    const clone = mainCard.cloneNode(true);
-    clone.id = "cloned-presentation-card";
-    container.appendChild(clone);
-  }
-  document.getElementById("card-present-modal")?.classList.add("open");
-}
 
-function closePresentCard() {
-  document.getElementById("card-present-modal")?.classList.remove("open");
-}
+            <div class="palcard-body">
 
-function receiveNewCard(input) {
-  if (input.files && input.files[0]) {
-    alert("新しい名刺を受け取りました！アルバムに追加されます。");
-    input.value = "";
-  }
-}
+              <!-- プロフィール表示 -->
 
-function logout() {
-  if (confirm("ログアウトしますか？")) {
-    alert("ログアウトしました。");
-    closeDrawer();
-  }
-}
+              <div class="profile-info">
+
+                <div
+                  id="in-user-title"
+                  class="user-title-input">
+                  FOUNDER
+                </div>
+
+                <div
+                  id="in-name"
+                  class="pet-name">
+                  プロフ設定から入力
+                </div>
+
+
+                <div class="profile-fields">
+
+                  <div class="field-row">
+                    <span class="field-label">
+                      生年月日
+                    </span>
+
+                    <span
+                      id="in-birth"
+                      class="field-input">
+                      プロフ設定から入力
+                    </span>
+                  </div>
+
+
+                  <div class="field-row">
+                    <span class="field-label">
+                      ニックネーム
+                    </span>
+
+                    <span
+                      id="in-nickname"
+                      class="field-input">
+                      プロフ設定から入力
+                    </span>
+                  </div>
+
+
+                  <div class="field-row">
+                    <span class="field-label">
+                      pallike
+                    </span>
+
+                    <span
+                      class="field-input"
+                      id="in-pallike">
+                      ♡ 0
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- ===== アバター ===== -->
+
+              <div class="right-avatar-container">
+
+                <label
+                  class="avatar-wrapper"
+                  id="main-avatar-wrapper"
+                  onclick="event.stopPropagation()">
+
+                  <div class="avatar-inner">
+
+                    <img
+                      id="avatar-img"
+                      src="">
+
+                  </div>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onchange="previewImg(this, 'avatar-img')">
+
+                </label>
+
+
+                <div
+                  class="present-pet-name"
+                  id="present-pet-name-display"
+                  style="display:none;">
+                  プロフ設定から入力
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- ===== カード下部 ===== -->
+
+            <div
+              class="palcard-footer"
+              id="main-palcard-footer">
+
+              <div class="footer-left-group">
+
+                <button
+                  class="icon-btn"
+                  onclick="event.stopPropagation(); presentCard();">
+                  名刺を渡す
+                </button>
+
+
+                <label
+                  class="icon-btn"
+                  onclick="event.stopPropagation()">
+
+                  名刺を受け取る
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onchange="receiveNewCard(this)">
+
+                </label>
+
+              </div>
+
+
+              <!-- SNS -->
+
+              <div class="sns-links-container">
+
+                <a
+                  id="btn-sns-instagram"
+                  href="#"
+                  target="_blank"
+                  class="sns-btn"
+                  onclick="event.stopPropagation()">
+                  📸
+                </a>
+
+                <a
+                  id="btn-sns-x"
+                  href="#"
+                  target="_blank"
+                  class="sns-btn"
+                  onclick="event.stopPropagation()">
+                  𝕏
+                </a>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ===== 裏面 ===== -->
+
+          <div
+            class="palcard palcard-back"
+            id="back-palcard">
+
+            <div class="palcard-brand">
+              PALCARD
+            </div>
+
+
+            <div class="back-content">
+
+              <div>
+
+                <div class="back-owner-title">
+                  MESSAGE
+                </div>
+
+                <div
+                  class="back-owner-name"
+                  id="back-message-display">
+                  プロフ設定から入力
+                </div>
+
+              </div>
+
+
+              <div class="back-sns-list">
+
+                <a
+                  id="back-btn-instagram"
+                  href="#"
+                  target="_blank"
+                  class="back-sns-item inactive">
+                  📸 Instagramを開く
+                </a>
+
+                <a
+                  id="back-btn-x"
+                  href="#"
+                  target="_blank"
+                  class="back-sns-item inactive">
+                  𝕏 (Twitter) を開く
+                </a>
+
+              </div>
+
+            </div>
+
+
+            <div class="back-flip-tip">
+              もう一度タップして表面に戻る
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+           9 GRID
+      ========================== -->
+
+      <div class="grid-container">
+
+
+        <!-- 1 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            MONTHLY
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g0">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g0')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 2 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            CHARMPOINT
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g1">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g1')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 3 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+
+            <input
+              type="text"
+              id="custom-free-label"
+              class="grid-label-input"
+              value="FREE"
+              placeholder="タイトル"
+              maxlength="12">
+
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g2">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g2')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 4 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            FOOD
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g3">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g3')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 5 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            MAIN
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g4">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g4')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 6 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            SLEEPING
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g5">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g5')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 7 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            TOYS
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g6">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g6')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 8 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            FUNNYSHOT
+          </div>
+
+          <label class="grid-image-box">
+
+            <img id="g7">
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="previewGrid(this, 'g7')">
+
+          </label>
+
+        </div>
+
+
+        <!-- 9 -->
+
+        <div class="grid-item">
+
+          <div class="grid-label">
+            PALMEL
+          </div>
+
+          <div class="grid-number-box">
+
+            <span class="styled-number">
+              9
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       名刺を渡す
+  ========================== -->
+
+  <div
+    id="card-present-modal"
+    class="card-present-overlay"
+    onclick="closePresentCard()">
+
+    <div
+      class="card-present-wrapper"
+      id="present-card-container">
+    </div>
+
+    <div class="card-present-tip">
+      タップして閉じる
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       プロフ設定
+  ========================== -->
+
+  <div
+    id="account-modal"
+    class="modal-overlay">
+
+    <div class="modal-content">
+
+      <h3>
+        PROFILE SETTINGS
+      </h3>
+
+
+      <!-- ペット名 -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          ペット名
+        </label>
+
+        <input
+          type="text"
+          id="acc-pet-name"
+          class="form-input"
+          placeholder="ペットの名前を入力">
+
+      </div>
+
+
+      <!-- 肩書き -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          肩書き
+        </label>
+
+        <input
+          type="text"
+          id="acc-user-title"
+          class="form-input"
+          placeholder="例：FOUNDER">
+
+      </div>
+
+
+      <!-- 生年月日 -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          生年月日
+        </label>
+
+        <input
+          type="text"
+          id="acc-birth"
+          class="form-input"
+          placeholder="YYYY.MM.DD">
+
+      </div>
+
+
+      <!-- ニックネーム -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          ニックネーム
+        </label>
+
+        <input
+          type="text"
+          id="acc-nickname"
+          class="form-input"
+          placeholder="ニックネームを入力">
+
+      </div>
+
+
+      <!-- 一言メッセージ -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          一言メッセージ
+        </label>
+
+        <input
+          type="text"
+          id="acc-message"
+          class="form-input"
+          placeholder="ひとこと入力"
+          maxlength="60">
+
+      </div>
+
+
+      <!-- Instagram -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          Instagram ID
+        </label>
+
+        <input
+          type="text"
+          id="acc-instagram"
+          class="form-input"
+          placeholder="ユーザー名を入力">
+
+      </div>
+
+
+      <!-- X -->
+
+      <div class="form-group">
+
+        <label class="form-label">
+          X (Twitter) ID
+        </label>
+
+        <input
+          type="text"
+          id="acc-x"
+          class="form-input"
+          placeholder="ユーザー名を入力">
+
+      </div>
+
+
+      <button
+        class="action-btn-main"
+        onclick="saveAccountSettings()">
+        保存する
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       ボトムナビ
+  ========================== -->
+
+  <nav class="bottom-nav">
+
+    <a
+      class="nav-btn active"
+      href="index.html">
+      🏠
+      <span>マイパル</span>
+    </a>
+
+
+    <a
+      class="nav-btn"
+      href="pages/album.html">
+      📖
+      <span>アルバム</span>
+    </a>
+
+
+    <a
+      class="nav-btn"
+      href="pages/exchange.html">
+      🎴
+      <span>名刺/9マス</span>
+    </a>
+
+
+    <a
+      class="nav-btn"
+      href="pages/pals.html">
+      🐾
+      <span>みんなのパル</span>
+    </a>
+
+  </nav>
+
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>
