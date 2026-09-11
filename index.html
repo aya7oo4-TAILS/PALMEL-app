@@ -347,9 +347,9 @@
       position: relative;
     }
     
-    /* アップロードされた画像に薄い黒オーバーレイをかける */
+    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける（より暗く） */
     .grid-item.palmel-item .grid-image-box img.has-image {
-      filter: brightness(0.72);
+      filter: brightness(0.45);
     }
 
     /* 光るPALMELロゴのスタイル（一番手前に常時配置） */
@@ -567,10 +567,10 @@
             const isPalmel = (i === 8);
             const extraClass = isPalmel ? ' palmel-item' : '';
 
-            // 右下のNOSE＋PALMELマスだけ最初から光るロゴを最前面に配置
+            // 右下のマスの中身だけ「PALMEL」表示にする
             const innerExtra = isPalmel ? `
               <div class="palmel-overlay-logo">
-                NOSE＋PALMEL
+                PALMEL
                 <span class="palmel-overlay-sub">SPECIAL</span>
               </div>
             ` : '';
