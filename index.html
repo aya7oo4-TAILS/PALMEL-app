@@ -224,7 +224,7 @@
     .back-sns-item.inactive { opacity: 0.4; pointer-events: none; }
     .back-flip-tip { font-size: 0.48rem; color: var(--text-sub); letter-spacing: 0.1em; opacity: 0.7; }
 
-    /* プレゼン拡大時のスタイル（180度回転・横向き全画面表示） */
+    /* プレゼン拡大時のスタイル */
     .card-present-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98);
       backdrop-filter: blur(20px); z-index: 20000; justify-content: center; align-items: center; cursor: pointer;
@@ -245,7 +245,6 @@
       opacity: 1; 
     }
 
-    /* 「タップして閉じる」文言（回転しても見やすい位置に固定） */
     .card-present-tip { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: var(--text-sub); font-size: 0.65rem; letter-spacing: 0.1em; pointer-events: none; z-index: 20001; }
 
     .palcard.is-presented {
@@ -269,7 +268,6 @@
     
     .palcard.is-presented .user-title-display { display: none !important; }
     
-    /* 左側（QRコード配置エリア） - 位置とサイズは完全固定 */
     .palcard.is-presented .profile-info { 
       flex: 1 !important; 
       display: flex !important; 
@@ -301,7 +299,6 @@
       object-fit: contain !important;
     }
 
-    /* 右側（アイコン＆名前エリア） - アイコンの位置・サイズは完全固定 */
     .palcard.is-presented .right-avatar-container { 
       flex: 1 !important; 
       width: auto !important; 
@@ -327,14 +324,13 @@
     }
     .palcard.is-presented .right-avatar-container .avatar-inner { border-radius: 50% !important; }
     
-    /* 名前（MEL）の文字をもう少し縮小 */
     .palcard.is-presented .present-pet-name { display: block !important; font-family: 'Cinzel', serif; font-size: 1.8rem !important; margin: 0 !important; text-align: center !important; line-height: 1.0 !important; color: #fff; font-weight: 700; letter-spacing: 0.05em; }
     .palcard.is-presented .pet-name { display: none !important; }
 
     /* 9マス Grid */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
     .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
-    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; }
+    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
     
     .grid-label-input {
       background: transparent; border: none; border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
@@ -343,8 +339,59 @@
     .grid-label-input::placeholder { color: rgba(229, 192, 123, 0.4); }
     .grid-label-input:focus { border-bottom-color: var(--gold); background: rgba(0, 0, 0, 0.3); }
 
-    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
     .grid-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* 右下「NOSE＋PALMEL」のマス専用の演出レイアウト */
+    .grid-item.palmel-item .grid-image-box {
+      position: relative;
+    }
+    
+    /* アップロードされた画像に薄い黒オーバーレイをかける */
+    .grid-item.palmel-item .grid-image-box img.has-image {
+      filter: brightness(0.72);
+    }
+
+    /* 光るPALMELロゴのスタイル（一番手前に常時配置） */
+    .palmel-overlay-logo {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none; /* タップが下のファイル選択に抜けるようにする */
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 0 10px rgba(229, 192, 123, 0.6), 0 0 20px rgba(229, 192, 123, 0.3);
+      font-size: 0.8rem;
+      font-weight: 700;
+      animation: palmelGlow 3s ease-in-out infinite alternate;
+      text-align: center;
+      padding: 0 2px;
+    }
+
+    .palmel-overlay-sub {
+      font-size: 0.38rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+
+    @keyframes palmelGlow {
+      0% {
+        text-shadow: 0 0 8px rgba(229, 192, 123, 0.4), 0 0 15px rgba(229, 192, 123, 0.2);
+        opacity: 0.85;
+      }
+      100% {
+        text-shadow: 0 0 14px rgba(229, 192, 123, 0.8), 0 0 25px rgba(229, 192, 123, 0.5);
+        opacity: 1;
+      }
+    }
+
     input[type="file"] { display: none; }
 
     .custom-file-btn {
@@ -365,25 +412,6 @@
     .custom-file-btn:active {
       background: rgba(229, 192, 123, 0.15);
       border-color: var(--gold);
-    }
-
-    .grid-number-box {
-      flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1b2025 0%, #101214 100%);
-      position: relative;
-    }
-    .grid-number-box::after {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at center, rgba(229,192,123,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .styled-number {
-      font-family: 'Cinzel', serif;
-      font-size: 2.8rem;
-      font-weight: 500;
-      color: var(--gold);
-      opacity: 0.85;
-      letter-spacing: -0.05em;
     }
 
     /* モーダル・ドロワー関連のスタイル */
@@ -464,7 +492,7 @@
     <!-- MYPAL ホーム画面 -->
     <div id="page-mypal" class="page active">
 
-      <!-- 名刺カード（3Dフリップ対応・どこを押しても回転） -->
+      <!-- 名刺カード（3Dフリップ対応） -->
       <div class="palcard-container" id="palcard-container" onclick="toggleCardFlip(event)">
         <div class="palcard-flipper">
           
@@ -530,31 +558,32 @@
       <!-- 9マス Grid -->
       <div class="grid-container">
         <script>
-          const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'PALMEL'];
+          const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
           gridLabels.forEach((lbl, i) => {
-            const isPalmelBox = (i === 8);
             const labelHtml = (i === 2)
               ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12">`
               : lbl;
 
-            if (isPalmelBox) {
-              document.write(`
-                <div class="grid-item">
-                  <div class="grid-label">${labelHtml}</div>
-                  <div class="grid-number-box">
-                    <span class="styled-number">9</span>
-                  </div>
-                </div>`);
-            } else {
-              document.write(`
-                <div class="grid-item">
-                  <div class="grid-label">${labelHtml}</div>
-                  <label class="grid-image-box">
-                    <img id="g${i}">
-                    <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}')">
-                  </label>
-                </div>`);
-            }
+            const isPalmel = (i === 8);
+            const extraClass = isPalmel ? ' palmel-item' : '';
+
+            // 右下のNOSE＋PALMELマスだけ最初から光るロゴを最前面に配置
+            const innerExtra = isPalmel ? `
+              <div class="palmel-overlay-logo">
+                NOSE＋PALMEL
+                <span class="palmel-overlay-sub">SPECIAL</span>
+              </div>
+            ` : '';
+
+            document.write(`
+              <div class="grid-item${extraClass}">
+                <div class="grid-label">${labelHtml}</div>
+                <label class="grid-image-box">
+                  <img id="g${i}">
+                  ${innerExtra}
+                  <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}', ${isPalmel})">
+                </label>
+              </div>`);
           });
         </script>
       </div>
@@ -618,7 +647,7 @@
     </div>
   </div>
 
-  <!-- PALINK拡大表示用モーダル（90度回転表示） -->
+  <!-- PALINK拡大表示用モーダル -->
   <div id="card-present-modal" class="card-present-overlay" onclick="closePresentCard()">
     <div class="card-present-wrapper" id="present-card-container"></div>
     <div class="card-present-tip">タップして閉じる</div>
@@ -807,13 +836,16 @@
       alert('アカウント情報を更新しました！');
     }
 
-    function previewGrid(input, imgId) {
+    function previewGrid(input, imgId, isPalmel) {
       if (input.files && input.files[0]) {
         const r = new FileReader();
         r.onload = e => {
           const img = document.getElementById(imgId);
           img.src = e.target.result;
           img.style.display = 'block';
+          if (isPalmel) {
+            img.classList.add('has-image');
+          }
         };
         r.readAsDataURL(input.files[0]);
       }
