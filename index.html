@@ -347,12 +347,12 @@
       position: relative;
     }
     
-    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける（より暗く） */
+    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける */
     .grid-item.palmel-item .grid-image-box img.has-image {
       filter: brightness(0.45);
     }
 
-    /* 光るPALMELロゴのスタイル（一番手前に常時配置） */
+    /* 光るPALMELロゴのスタイル（Specialを削除） */
     .palmel-overlay-logo {
       position: absolute;
       inset: 0;
@@ -361,7 +361,7 @@
       align-items: center;
       justify-content: center;
       z-index: 5;
-      pointer-events: none; /* タップが下のファイル選択に抜けるようにする */
+      pointer-events: none;
       font-family: 'Cinzel', serif;
       letter-spacing: 0.15em;
       color: rgba(255, 255, 255, 0.95);
@@ -371,14 +371,6 @@
       animation: palmelGlow 3s ease-in-out infinite alternate;
       text-align: center;
       padding: 0 2px;
-    }
-
-    .palmel-overlay-sub {
-      font-size: 0.38rem;
-      letter-spacing: 0.25em;
-      color: var(--gold);
-      margin-top: 2px;
-      opacity: 0.85;
     }
 
     @keyframes palmelGlow {
@@ -567,11 +559,10 @@
             const isPalmel = (i === 8);
             const extraClass = isPalmel ? ' palmel-item' : '';
 
-            // 右下のマスの中身だけ「PALMEL」表示にする
+            // 右下のマスの中身「PALMEL」のみ（Specialは削除）
             const innerExtra = isPalmel ? `
               <div class="palmel-overlay-logo">
                 PALMEL
-                <span class="palmel-overlay-sub">SPECIAL</span>
               </div>
             ` : '';
 
