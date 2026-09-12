@@ -202,6 +202,7 @@
     }
     .sns-btn.active { display: flex; }
 
+    /* 背面カード専用のデザインレイアウト */
     .back-content {
       display: flex;
       flex-direction: column;
@@ -223,6 +224,7 @@
     .back-sns-item.inactive { opacity: 0.4; pointer-events: none; }
     .back-flip-tip { font-size: 0.48rem; color: var(--text-sub); letter-spacing: 0.1em; opacity: 0.7; }
 
+    /* プレゼン拡大時のスタイル */
     .card-present-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98);
       backdrop-filter: blur(20px); z-index: 20000; justify-content: center; align-items: center; cursor: pointer;
@@ -259,8 +261,11 @@
     }
     .palcard.is-presented .profile-fields,
     .palcard.is-presented .palcard-footer { display: none !important; }
+    
     .palcard.is-presented .palcard-brand { font-size: 0.75rem !important; letter-spacing: 0.35em !important; display: block !important; margin-bottom: 2px !important; margin-top: 0 !important; }
+    
     .palcard.is-presented .palcard-body { display: flex !important; flex-direction: row !important; align-items: flex-start !important; justify-content: space-between !important; height: auto !important; gap: 12px !important; margin-top: 10px !important; }
+    
     .palcard.is-presented .user-title-display { display: none !important; }
     
     .palcard.is-presented .profile-info { 
@@ -325,7 +330,7 @@
     /* 9マス Grid */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
     .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
-    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; }
+    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
     
     .grid-label-input {
       background: transparent; border: none; border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
@@ -334,26 +339,74 @@
     .grid-label-input::placeholder { color: rgba(229, 192, 123, 0.4); }
     .grid-label-input:focus { border-bottom-color: var(--gold); background: rgba(0, 0, 0, 0.3); }
 
-    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
     .grid-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* 右下「NOSE＋PALMEL」のマス専用の演出レイアウト */
+    .grid-item.palmel-item .grid-image-box {
+      position: relative;
+    }
+    
+    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける */
+    .grid-item.palmel-item .grid-image-box img.has-image {
+      filter: brightness(0.45);
+    }
+
+    /* 光るPALMELロゴのスタイル */
+    .palmel-overlay-logo {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 0 10px rgba(229, 192, 123, 0.6), 0 0 20px rgba(229, 192, 123, 0.3);
+      font-size: 0.8rem;
+      font-weight: 700;
+      animation: palmelGlow 3s ease-in-out infinite alternate;
+      text-align: center;
+      padding: 0 2px;
+    }
+
+    @keyframes palmelGlow {
+      0% {
+        text-shadow: 0 0 8px rgba(229, 192, 123, 0.4), 0 0 15px rgba(229, 192, 123, 0.2);
+        opacity: 0.85;
+      }
+      100% {
+        text-shadow: 0 0 14px rgba(229, 192, 123, 0.8), 0 0 25px rgba(229, 192, 123, 0.5);
+        opacity: 1;
+      }
+    }
+
     input[type="file"] { display: none; }
 
     .custom-file-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px; padding: 10px 14px; color: var(--text-main); font-size: 0.75rem;
-      cursor: pointer; width: 100%; text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 0.75rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .custom-file-btn:active {
+      background: rgba(229, 192, 123, 0.15);
+      border-color: var(--gold);
     }
 
-    .grid-number-box {
-      flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1b2025 0%, #101214 100%);
-      position: relative;
-    }
-    .styled-number {
-      font-family: 'Cinzel', serif; font-size: 2.8rem; font-weight: 500; color: var(--gold); opacity: 0.85; letter-spacing: -0.05em;
-    }
-
+    /* モーダル・ドロワー関連のスタイル */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95); backdrop-filter: blur(12px); z-index: 8500; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; padding: 20px; max-height: 85vh; overflow-y: auto; }
@@ -364,13 +417,19 @@
     .form-input:focus { border-color: var(--gold); }
 
     .drawer-overlay {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 25000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px); z-index: 25000; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
     }
     .drawer-overlay.active { opacity: 1; pointer-events: auto; }
 
     .side-drawer {
-      position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 26000; transform: translateX(-100%); display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+      position: fixed; top: 0; left: 0; width: 280px; height: 100%;
+      background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 26000; transform: translateX(-100%);
+      display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+      will-change: transform;
     }
     .side-drawer.animated { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .side-drawer.open { transform: translateX(0); }
@@ -383,15 +442,18 @@
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-main); font-size: 0.8rem;
-      cursor: pointer; text-align: left; text-decoration: none; width: 100%;
+      cursor: pointer; text-align: left; transition: background 0.2s ease; text-decoration: none; width: 100%;
     }
+    .drawer-item:active { background: rgba(229,192,123,0.15); border-color: var(--gold); }
 
+    /* ボトムナビゲーション */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 414px; height: 60px;
       background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(16px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex; justify-content: space-around; align-items: center; z-index: 99999;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.62rem; cursor: pointer; width: 25%; text-decoration: none; }
     .nav-btn.active { color: var(--gold); }
@@ -399,7 +461,9 @@
 </head>
 <body class="mypal-mode">
 
+  <!-- サイドドロワーメニュー -->
   <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+  
   <aside id="side-drawer" class="side-drawer">
     <div>
       <div class="drawer-header">
@@ -416,9 +480,15 @@
   </aside>
 
   <div class="app-viewport">
+    
+    <!-- MYPAL ホーム画面 -->
     <div id="page-mypal" class="page active">
+
+      <!-- 名刺カード（3Dフリップ対応） -->
       <div class="palcard-container" id="palcard-container" onclick="toggleCardFlip(event)">
         <div class="palcard-flipper">
+          
+          <!-- 表面 -->
           <div class="palcard" id="main-palcard">
             <div class="palcard-brand">PALCARD</div>
             <div class="palcard-body">
@@ -456,6 +526,7 @@
             </div>
           </div>
 
+          <!-- 背面 -->
           <div class="palcard palcard-back" id="back-palcard">
             <div class="palcard-brand">PALCARD</div>
             <div class="back-content">
@@ -468,74 +539,111 @@
                 <a id="back-btn-x" href="#" target="_blank" class="back-sns-item inactive" onclick="event.stopPropagation()">𝕏 (Twitter) を開く</a>
               </div>
             </div>
-            <div style="text-align: center;"><span class="back-flip-tip">もう一度タップして表面に戻る</span></div>
+            <div style="text-align: center;">
+              <span class="back-flip-tip">もう一度タップして表面に戻る</span>
+            </div>
           </div>
+
         </div>
       </div>
 
       <!-- 9マス Grid -->
-      <div class="grid-container" id="main-grid-container">
+      <div class="grid-container">
         <script>
-          const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'PALMEL'];
+          const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
           gridLabels.forEach((lbl, i) => {
-            const isPalmelBox = (i === 8);
             const labelHtml = (i === 2)
               ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12" oninput="saveGridDataToStorage()">`
               : lbl;
 
-            if (isPalmelBox) {
-              document.write(`
-                <div class="grid-item">
-                  <div class="grid-label">${labelHtml}</div>
-                  <div class="grid-number-box"><span class="styled-number">9</span></div>
-                </div>`);
-            } else {
-              document.write(`
-                <div class="grid-item">
-                  <div class="grid-label">${labelHtml}</div>
-                  <label class="grid-image-box">
-                    <img id="g${i}">
-                    <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}')">
-                  </label>
-                </div>`);
-            }
+            const isPalmel = (i === 8);
+            const extraClass = isPalmel ? ' palmel-item' : '';
+
+            const innerExtra = isPalmel ? `
+              <div class="palmel-overlay-logo">
+                PALMEL
+              </div>
+            ` : '';
+
+            document.write(`
+              <div class="grid-item${extraClass}">
+                <div class="grid-label">${labelHtml}</div>
+                <label class="grid-image-box">
+                  <img id="g${i}">
+                  ${innerExtra}
+                  <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}', ${isPalmel})">
+                </label>
+              </div>`);
           });
         </script>
       </div>
+
     </div>
+
   </div>
 
+  <!-- PALCARD編集モーダル -->
   <div id="palcard-edit-modal" class="modal-overlay">
     <div class="modal-content">
       <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold);">PALCARD EDIT</h3>
       <div style="margin-top:14px;">
-        <div class="form-group"><label class="form-label">アイコン画像</label><label class="custom-file-btn">写真を選ぶ<input type="file" id="edit-avatar-file" accept="image/*"></label></div>
-        <div class="form-group"><label class="form-label">ペットの名前</label><input type="text" id="edit-name" class="form-input"></div>
-        <div class="form-group"><label class="form-label">生年月日</label><input type="text" id="edit-birth" class="form-input"></div>
-        <div class="form-group"><label class="form-label">nickname</label><input type="text" id="edit-nickname" class="form-input"></div>
-        <div class="form-group"><label class="form-label">message</label><input type="text" id="edit-owner" class="form-input"></div>
-        <div class="form-group"><label class="form-label">オーナーネーム</label><input type="text" id="edit-ownername" class="form-input"></div>
+        <div class="form-group">
+          <label class="form-label">アイコン画像 (ペットの写真)</label>
+          <label class="custom-file-btn">
+            写真を選ぶ
+            <input type="file" id="edit-avatar-file" accept="image/*">
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ペットの名前 (例: MEL)</label>
+          <input type="text" id="edit-name" class="form-input" placeholder="名前を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">生年月日 (例: 2026.02.10)</label>
+          <input type="text" id="edit-birth" class="form-input" placeholder="生年月日を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">nickname (例: メルちゃん)</label>
+          <input type="text" id="edit-nickname" class="form-input" placeholder="ニックネームを入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">message (例: こんにちは)</label>
+          <input type="text" id="edit-owner" class="form-input" placeholder="メッセージを入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">オーナーネーム (例: Rui)</label>
+          <input type="text" id="edit-ownername" class="form-input" placeholder="オーナー名を入力">
+        </div>
       </div>
       <button style="margin-top:16px; width:100%; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="savePalcardEdit()">保存する</button>
     </div>
   </div>
 
+  <!-- アカウント設定モーダル -->
   <div id="account-modal" class="modal-overlay">
     <div class="modal-content">
       <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold);">ACCOUNT & PROFILE</h3>
       <div style="margin-top:14px;">
-        <div class="form-group"><label class="form-label">Instagram ID</label><input type="text" id="acc-instagram" class="form-input"></div>
-        <div class="form-group"><label class="form-label">X (Twitter) ID</label><input type="text" id="acc-x" class="form-input"></div>
+        <div class="form-group">
+          <label class="form-label">Instagram ID (例: username)</label>
+          <input type="text" id="acc-instagram" class="form-input" placeholder="ユーザー名を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label">X (Twitter) ID (例: username)</label>
+          <input type="text" id="acc-x" class="form-input" placeholder="ユーザー名を入力">
+        </div>
       </div>
       <button style="margin-top:16px; width:100%; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="saveAccountSettings()">保存する</button>
     </div>
   </div>
 
+  <!-- PALINK拡大表示用モーダル -->
   <div id="card-present-modal" class="card-present-overlay" onclick="closePresentCard()">
     <div class="card-present-wrapper" id="present-card-container"></div>
     <div class="card-present-tip">タップして閉じる</div>
   </div>
 
+  <!-- ボトムナビゲーション -->
   <nav class="bottom-nav">
     <a href="index.html" class="nav-btn active" id="btn-mypal">MYPAL</a>
     <a href="album.html" class="nav-btn" id="btn-album">ALBUM</a>
@@ -544,26 +652,24 @@
   </nav>
 
   <script>
-    const gridLabelsTemplate = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'PALMEL'];
+    const gridLabelsTemplate = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
 
-    // 9マスのデータをStorageに保存
+    // 9マスのデータをStorageに保存（アルバム画面と完全連動）
     function saveGridDataToStorage() {
       let gridData = [];
       for (let i = 0; i < 9; i++) {
         let label = (i === 2) ? (document.getElementById('custom-free-label')?.value || 'FREE') : gridLabelsTemplate[i];
         let image = '';
-        if (i !== 8) {
-          const imgEl = document.getElementById(`g${i}`);
-          if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) {
-            image = imgEl.src;
-          }
+        const imgEl = document.getElementById(`g${i}`);
+        if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) {
+          image = imgEl.src;
         }
         gridData.push({ label: label, image: image, isNumber: (i === 8) });
       }
       localStorage.setItem('parmel_grid_data', JSON.stringify(gridData));
     }
 
-    // 起動時にロード
+    // 起動時にローカルストレージから9マスやプロフィールの状態を復元
     window.addEventListener('DOMContentLoaded', () => {
       const savedData = localStorage.getItem('parmel_grid_data');
       if (savedData) {
@@ -574,12 +680,18 @@
               const freeInput = document.getElementById('custom-free-label');
               if (freeInput) freeInput.value = item.label || 'FREE';
             }
-            if (i !== 8 && item.image) {
+            if (item.image) {
               const imgEl = document.getElementById(`g${i}`);
-              if (imgEl) imgEl.src = item.image;
+              if (imgEl) {
+                imgEl.src = item.image;
+                imgEl.style.display = 'block';
+                if (i === 8) {
+                  imgEl.classList.add('has-image');
+                }
+              }
             }
           });
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error('Grid data load error', e); }
       }
     });
 
@@ -588,17 +700,26 @@
       const container = document.getElementById('palcard-container');
       const footer = document.getElementById('main-palcard-footer');
       container.classList.toggle('flipped');
-      footer.style.display = container.classList.contains('flipped') ? 'none' : 'flex';
+      
+      if (container.classList.contains('flipped')) {
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = 'flex';
+      }
     }
 
     function syncOwnerName(val) {
       const displayEl = document.getElementById('back-owner-display');
-      if (displayEl) displayEl.innerText = val ? val : 'OWNER';
+      if (displayEl) {
+        displayEl.innerText = val ? val : 'OWNER';
+      }
     }
 
     function syncCardName(val) {
       const displayEl = document.getElementById('present-pet-name-display');
-      if (displayEl) displayEl.innerText = val;
+      if (displayEl) {
+        displayEl.innerText = val;
+      }
     }
 
     const drawer = document.getElementById('side-drawer');
@@ -630,30 +751,45 @@
 
     window.addEventListener('touchmove', (e) => {
       if (!isTracking) return;
-      const diffX = e.touches[0].clientX - startX;
-      const diffY = Math.abs(e.touches[0].clientY - startY);
+      const touchX = e.touches[0].clientX;
+      const touchY = e.touches[0].clientY;
+      const diffX = touchX - startX;
+      const diffY = Math.abs(touchY - startY);
+
       if (diffY > Math.abs(diffX) && diffY > 10) { isTracking = false; return; }
 
-      if (!isOpen && diffX > 0) {
-        let translateX = Math.min(-DRAWER_WIDTH + diffX, 0);
-        drawer.style.transform = `translateX(${translateX}px)`;
-        drawerOverlay.style.opacity = Math.min(diffX / DRAWER_WIDTH, 1);
-        drawerOverlay.style.pointerEvents = 'auto';
-      } else if (isOpen && diffX < 0) {
-        let translateX = Math.max(diffX, -DRAWER_WIDTH);
-        drawer.style.transform = `translateX(${translateX}px)`;
-        drawerOverlay.style.opacity = Math.max(1 + (diffX / DRAWER_WIDTH), 0);
+      if (!isOpen) {
+        if (diffX > 0) {
+          let translateX = -DRAWER_WIDTH + diffX;
+          if (translateX > 0) translateX = 0;
+          drawer.style.transform = `translateX(${translateX}px)`;
+          drawerOverlay.style.opacity = Math.min(diffX / DRAWER_WIDTH, 1);
+          drawerOverlay.style.pointerEvents = 'auto';
+        }
+      } else {
+        if (diffX < 0) {
+          let translateX = diffX;
+          if (translateX < -DRAWER_WIDTH) translateX = -DRAWER_WIDTH;
+          drawer.style.transform = `translateX(${translateX}px)`;
+          drawerOverlay.style.opacity = Math.max(1 + (diffX / DRAWER_WIDTH), 0);
+        }
       }
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
       if (!isTracking) return;
       isTracking = false;
-      const diffX = e.changedTouches[0].clientX - startX;
+      const endX = e.changedTouches[0].clientX;
+      const diffX = endX - startX;
+
       drawerOverlay.style.opacity = '';
       drawerOverlay.style.pointerEvents = '';
-      if (!isOpen) { diffX > 50 ? openDrawer() : closeDrawer(); } 
-      else { diffX < -50 ? closeDrawer() : openDrawer(); }
+
+      if (!isOpen) {
+        if (diffX > 50) openDrawer(); else closeDrawer();
+      } else {
+        if (diffX < -50) closeDrawer(); else openDrawer();
+      }
     }, { passive: true });
 
     function toggleModal(id, show) {
@@ -677,22 +813,30 @@
 
     function savePalcardEdit() {
       const nameVal = document.getElementById('edit-name').value;
+      const birthVal = document.getElementById('edit-birth').value;
+      const nicknameVal = document.getElementById('edit-nickname').value;
+      const ownerVal = document.getElementById('edit-owner').value;
+      const ownernameVal = document.getElementById('edit-ownername').value;
+      const avatarInput = document.getElementById('edit-avatar-file');
+
       document.getElementById('in-name').innerText = nameVal;
-      document.getElementById('in-birth').innerText = document.getElementById('edit-birth').value;
-      document.getElementById('in-nickname').innerText = document.getElementById('edit-nickname').value;
-      document.getElementById('in-owner').innerText = document.getElementById('edit-owner').value;
+      document.getElementById('in-birth').innerText = birthVal;
+      document.getElementById('in-nickname').innerText = nicknameVal;
+      document.getElementById('in-owner').innerText = ownerVal;
 
       syncCardName(nameVal);
-      syncOwnerName(document.getElementById('edit-ownername').value);
+      syncOwnerName(ownernameVal);
 
-      const avatarInput = document.getElementById('edit-avatar-file');
       if (avatarInput.files && avatarInput.files[0]) {
         const r = new FileReader();
         r.onload = e => {
           document.getElementById('avatar-img').src = e.target.result;
+          const cloneAvatar = document.querySelector('#present-card-container #avatar-img');
+          if(cloneAvatar) cloneAvatar.src = e.target.result;
         };
         r.readAsDataURL(avatarInput.files[0]);
       }
+
       toggleModal('palcard-edit-modal', false);
       alert('PALCARDの情報を更新しました！');
     }
@@ -709,26 +853,33 @@
         const url = `https://instagram.com/${instaId.replace(/^@/, '')}`;
         btnInsta.href = url; btnInsta.classList.add('active');
         backBtnInsta.href = url; backBtnInsta.classList.remove('inactive');
-      } else { btnInsta.classList.remove('active'); backBtnInsta.classList.add('inactive'); }
+      } else {
+        btnInsta.classList.remove('active'); backBtnInsta.classList.add('inactive');
+      }
 
       if (xId) {
         const url = `https://x.com/${xId.replace(/^@/, '')}`;
         btnX.href = url; btnX.classList.add('active');
         backBtnX.href = url; backBtnX.classList.remove('inactive');
-      } else { btnX.classList.remove('active'); backBtnX.classList.add('inactive'); }
+      } else {
+        btnX.classList.remove('active'); backBtnX.classList.add('inactive');
+      }
 
       toggleModal('account-modal', false);
       alert('アカウント情報を更新しました！');
     }
 
-    function previewGrid(input, imgId) {
+    function previewGrid(input, imgId, isPalmel) {
       if (input.files && input.files[0]) {
         const r = new FileReader();
         r.onload = e => {
           const img = document.getElementById(imgId);
           img.src = e.target.result;
           img.style.display = 'block';
-          saveGridDataToStorage(); // 自動保存
+          if (isPalmel) {
+            img.classList.add('has-image');
+          }
+          saveGridDataToStorage(); // 自動保存を実行しアルバムと連動
         };
         r.readAsDataURL(input.files[0]);
       }
@@ -769,14 +920,22 @@
       container.appendChild(clone);
 
       const bottomNav = document.querySelector('.bottom-nav');
-      if (bottomNav) { bottomNav.style.opacity = '0'; bottomNav.style.pointerEvents = 'none'; }
+      if (bottomNav) {
+        bottomNav.style.opacity = '0';
+        bottomNav.style.pointerEvents = 'none';
+      }
+
       document.getElementById('card-present-modal').classList.add('active');
     }
 
     function closePresentCard() {
       document.getElementById('card-present-modal').classList.remove('active');
+
       const bottomNav = document.querySelector('.bottom-nav');
-      if (bottomNav) { bottomNav.style.opacity = '1'; bottomNav.style.pointerEvents = 'auto'; }
+      if (bottomNav) {
+        bottomNav.style.opacity = '1';
+        bottomNav.style.pointerEvents = 'auto';
+      }
     }
   </script>
 </body>
