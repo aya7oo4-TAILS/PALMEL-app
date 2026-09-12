@@ -341,47 +341,29 @@
   <div class="app-viewport">
     <h1 class="page-title">ALBUM</h1>
 
-    <!-- 9マス Grid (親) -->
+    <!-- 9マス Grid (固定HTML構造) -->
     <div class="grid-container">
-      <script>
-        const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
-        
-        gridLabels.forEach((lbl, i) => {
-          const labelHtml = (i === 2)
-            ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12">`
-            : lbl;
-
-          const isPalmel = (i === 8);
-          const extraClass = isPalmel ? ' palmel-item' : '';
-          const innerExtra = isPalmel ? `
-            <div class="palmel-overlay-logo">
-              PALMEL
-            </div>
-          ` : '';
-
-          document.write(`
-            <div class="grid-item${extraClass}">
-              <div class="grid-label">${labelHtml}</div>
-              <label class="grid-image-box">
-                <img id="g${i}">
-                ${innerExtra}
-                <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}', ${isPalmel})">
-              </label>
-            </div>`);
-        });
-      </script>
+      <div class="grid-item"><div class="grid-label">MONTHLY</div><label class="grid-image-box"><img id="g0"><input type="file" accept="image/*" onchange="previewGrid(this, 'g0', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">CHARMPOINT</div><label class="grid-image-box"><img id="g1"><input type="file" accept="image/*" onchange="previewGrid(this, 'g1', false)"></label></div>
+      <div class="grid-item"><div class="grid-label"><input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12"></div><label class="grid-image-box"><img id="g2"><input type="file" accept="image/*" onchange="previewGrid(this, 'g2', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">FOOD</div><label class="grid-image-box"><img id="g3"><input type="file" accept="image/*" onchange="previewGrid(this, 'g3', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">MAIN</div><label class="grid-image-box"><img id="g4"><input type="file" accept="image/*" onchange="previewGrid(this, 'g4', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">SLEEPING</div><label class="grid-image-box"><img id="g5"><input type="file" accept="image/*" onchange="previewGrid(this, 'g5', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">TOYS</div><label class="grid-image-box"><img id="g6"><input type="file" accept="image/*" onchange="previewGrid(this, 'g6', false)"></label></div>
+      <div class="grid-item"><div class="grid-label">FUNNYSHOT</div><label class="grid-image-box"><img id="g7"><input type="file" accept="image/*" onchange="previewGrid(this, 'g7', false)"></label></div>
+      <div class="grid-item palmel-item"><div class="grid-label">NOSE＋PALMEL</div><label class="grid-image-box"><img id="g8"><div class="palmel-overlay-logo">PALMEL</div><input type="file" accept="image/*" onchange="previewGrid(this, 'g8', true)"></label></div>
     </div>
 
     <!-- アルバムに追加ボタン -->
     <div class="save-btn-container">
-      <button id="save-album-btn" class="save-btn">アルバムに追加</button>
+      <button id="save-album-btn" class="save-btn" type="button">アルバムに追加</button>
     </div>
 
-    <!-- 過去に保存したアルバム一覧（下に蓄積 / PALMEL MEMORY） -->
+    <!-- 過去に保存したアルバム一覧（PALMEL MEMORY） -->
     <div class="history-section">
       <h2 class="history-title">PALMEL MEMORY</h2>
       <div class="history-list" id="history-list-container">
-        <!-- ここに保存されたアルバムが追加されます -->
+        <!-- 保存された履歴がここに入ります -->
       </div>
     </div>
   </div>
@@ -594,7 +576,7 @@
       loadCurrentDraft();
       renderHistory();
 
-      // ボタンのイベントリスナーを確実に追加
+      // ボタンのクリックイベントを確実に入力
       const saveBtn = document.getElementById('save-album-btn');
       if (saveBtn) {
         saveBtn.addEventListener('click', window.saveAlbumToHistory);
