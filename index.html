@@ -206,13 +206,6 @@
       text-decoration: none;
     }
 
-    .sns-links-container { display: flex; gap: 6px; align-items: center; }
-    .sns-btn {
-      display: none; height: 26px; width: 26px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 8px; color: var(--text-main); font-size: 0.7rem; align-items: center; justify-content: center; text-decoration: none;
-    }
-    .sns-btn.active { display: flex; }
-
     /* 背面カード専用のデザインレイアウト */
     .back-content {
       display: flex;
@@ -521,10 +514,6 @@
                   <span>GET</span>
                   <input type="file" accept="image/*" capture="environment" onchange="handleGetCamera(this)">
                 </label>
-              </div>
-              <div class="sns-links-container">
-                <a id="btn-sns-instagram" href="#" target="_blank" class="sns-btn" title="Instagram" onclick="event.stopPropagation()">📸</a>
-                <a id="btn-sns-x" href="#" target="_blank" class="sns-btn" title="X (Twitter)" onclick="event.stopPropagation()">𝕏</a>
               </div>
             </div>
           </div>
@@ -879,25 +868,23 @@
     function saveAccountSettings() {
       const instaId = document.getElementById('acc-instagram').value.trim();
       const xId = document.getElementById('acc-x').value.trim();
-      const btnInsta = document.getElementById('btn-sns-instagram');
-      const btnX = document.getElementById('btn-sns-x');
       const backBtnInsta = document.getElementById('back-btn-instagram');
       const backBtnX = document.getElementById('back-btn-x');
 
       if (instaId) {
         const url = `https://instagram.com/${instaId.replace(/^@/, '')}`;
-        btnInsta.href = url; btnInsta.classList.add('active');
-        backBtnInsta.href = url; backBtnInsta.classList.remove('inactive');
+        backBtnInsta.href = url; 
+        backBtnInsta.classList.remove('inactive');
       } else {
-        btnInsta.classList.remove('active'); backBtnInsta.classList.add('inactive');
+        backBtnInsta.classList.add('inactive');
       }
 
       if (xId) {
         const url = `https://x.com/${xId.replace(/^@/, '')}`;
-        btnX.href = url; btnX.classList.add('active');
-        backBtnX.href = url; backBtnX.classList.remove('inactive');
+        backBtnX.href = url; 
+        backBtnX.classList.remove('inactive');
       } else {
-        btnX.classList.remove('active'); backBtnX.classList.add('inactive');
+        backBtnX.classList.add('inactive');
       }
 
       toggleModal('account-modal', false);
