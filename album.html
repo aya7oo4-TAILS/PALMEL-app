@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PARMEL - ALBUM</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- html2canvas ライブラリを復元 -->
+  <!-- html2canvas ライブラリ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
@@ -341,7 +341,7 @@
   <div class="app-viewport">
     <h1 class="page-title">ALBUM</h1>
 
-    <!-- 9マス Grid -->
+    <!-- 9マス Grid (親) -->
     <div class="grid-container">
       <script>
         const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
@@ -372,16 +372,16 @@
       </script>
     </div>
 
-    <!-- 保存するボタン -->
+    <!-- アルバムに追加ボタン -->
     <div class="save-btn-container">
-      <button id="save-album-btn" class="save-btn" onclick="saveAlbumToHistory()">アルバムに追加</button>
+      <button id="save-album-btn" class="save-btn">アルバムに追加</button>
     </div>
 
-    <!-- 過去に保存したアルバム一覧（下に蓄積） -->
+    <!-- 過去に保存したアルバム一覧（下に蓄積 / PALMEL MEMORY） -->
     <div class="history-section">
       <h2 class="history-title">PALMEL MEMORY</h2>
       <div class="history-list" id="history-list-container">
-        <!-- ここに保存されたアルバムがどんどん追加されます -->
+        <!-- ここに保存されたアルバムが追加されます -->
       </div>
     </div>
   </div>
@@ -403,7 +403,7 @@
     function saveCurrentDraft() {
       const data = {
         images: [],
-        freeLabel: document.getElementById('custom-free-label') ? document.getElementById('custom-free-label'].value : 'FREE'
+        freeLabel: document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE'
       };
       for (let i = 0; i < 9; i++) {
         const imgEl = document.getElementById(`g${i}`);
@@ -412,6 +412,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
+    // ドラフトの読み込み
     function loadCurrentDraft() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -436,25 +437,28 @@
     }
 
     // 画像プレビュー時
-    function previewGrid(input, imgId, isPalmel) {
+    window.previewGrid = function(input, imgId, isPalmel) {
       if (input.files && input.files[0]) {
         const r = new FileReader();
         r.onload = e => {
           const img = document.getElementById(imgId);
-          img.src = e.target.result;
-          if (isPalmel) img.classList.add('has-image');
-          saveCurrentDraft();
+          if (img) {
+            img.src = e.target.result;
+            if (isPalmel) img.classList.add('has-image');
+            saveCurrentDraft();
+          }
         };
         r.readAsDataURL(input.files[0]);
       }
-    }
+    };
 
-    // 「アルバムに追加」ボタンを押したときの処理 ＋ エフェクト
-    function saveAlbumToHistory() {
+    // 「アルバムに追加」ボタンの処理
+    window.saveAlbumToHistory = function() {
       const btn = document.getElementById('save-album-btn');
-      if (btn.classList.contains('saved')) return;
+      if (!btn || btn.classList.contains('saved')) return;
 
-      const freeLabelVal = document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE';
+      const freeInput = document.getElementById('custom-free-label');
+      const freeLabelVal = freeInput ? freeInput.value : 'FREE';
       
       const currentImages = [];
       for (let i = 0; i < 9; i++) {
@@ -492,11 +496,12 @@
         btn.classList.remove('saved');
         btn.innerText = 'アルバムに追加';
       }, 1500);
-    }
+    };
 
-    // 履歴を画面に描画
+    // 履歴（PALMEL MEMORY）を画面に描画
     function renderHistory() {
       const container = document.getElementById('history-list-container');
+      if (!container) return;
       container.innerHTML = '';
 
       let history = [];
@@ -551,8 +556,8 @@
       });
     }
 
-    // 写真に保存する機能（html2canvasを使って画像化して保存）
-    function saveToPhone(id) {
+    // 写真に保存する機能（html2canvas）
+    window.saveToPhone = function(id) {
       const gridEl = document.getElementById(`history-grid-${id}`);
       if (!gridEl) return;
 
@@ -569,10 +574,10 @@
         console.error('画像保存に失敗しました', err);
         alert('画像の保存に失敗しました');
       });
-    }
+    };
 
     // 履歴の削除
-    function deleteHistoryItem(id) {
+    window.deleteHistoryItem = function(id) {
       if (!confirm('この保存アルバムを削除しますか？')) return;
       try {
         let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -582,11 +587,18 @@
       } catch (e) {
         console.error(e);
       }
-    }
+    };
 
+    // 初期化処理
     window.addEventListener('DOMContentLoaded', () => {
       loadCurrentDraft();
       renderHistory();
+
+      // ボタンのイベントリスナーを確実に追加
+      const saveBtn = document.getElementById('save-album-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', window.saveAlbumToHistory);
+      }
 
       const freeInput = document.getElementById('custom-free-label');
       if (freeInput) {
