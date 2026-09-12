@@ -347,12 +347,12 @@
       position: relative;
     }
     
-    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける */
+    /* アップロードされた画像にしっかりとした暗いオーバーレイをかける（より暗く） */
     .grid-item.palmel-item .grid-image-box img.has-image {
       filter: brightness(0.45);
     }
 
-    /* 光るPALMELロゴのスタイル */
+    /* 光るPALMELロゴのスタイル（一番手前に常時配置） */
     .palmel-overlay-logo {
       position: absolute;
       inset: 0;
@@ -361,7 +361,7 @@
       align-items: center;
       justify-content: center;
       z-index: 5;
-      pointer-events: none;
+      pointer-events: none; /* タップが下のファイル選択に抜けるようにする */
       font-family: 'Cinzel', serif;
       letter-spacing: 0.15em;
       color: rgba(255, 255, 255, 0.95);
@@ -371,6 +371,14 @@
       animation: palmelGlow 3s ease-in-out infinite alternate;
       text-align: center;
       padding: 0 2px;
+    }
+
+    .palmel-overlay-sub {
+      font-size: 0.38rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      margin-top: 2px;
+      opacity: 0.85;
     }
 
     @keyframes palmelGlow {
@@ -553,15 +561,17 @@
           const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
           gridLabels.forEach((lbl, i) => {
             const labelHtml = (i === 2)
-              ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12" oninput="saveGridDataToStorage()">`
+              ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12">`
               : lbl;
 
             const isPalmel = (i === 8);
             const extraClass = isPalmel ? ' palmel-item' : '';
 
+            // 右下のマスの中身だけ「PALMEL」表示にする
             const innerExtra = isPalmel ? `
               <div class="palmel-overlay-logo">
                 PALMEL
+                <span class="palmel-overlay-sub">SPECIAL</span>
               </div>
             ` : '';
 
@@ -652,48 +662,68 @@
   </nav>
 
   <script>
-    const gridLabelsTemplate = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+    // --- アルバム機能と連動するストレージ保存・読み込み機能 ---
+    const STORAGE_KEY = 'parmel_grid_data';
 
-    // 9マスのデータをStorageに保存（アルバム画面と完全連動）
     function saveGridDataToStorage() {
-      let gridData = [];
+      const data = {
+        images: [],
+        freeLabel: document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE'
+      };
+
       for (let i = 0; i < 9; i++) {
-        let label = (i === 2) ? (document.getElementById('custom-free-label')?.value || 'FREE') : gridLabelsTemplate[i];
-        let image = '';
         const imgEl = document.getElementById(`g${i}`);
-        if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) {
-          image = imgEl.src;
-        }
-        gridData.push({ label: label, image: image, isNumber: (i === 8) });
+        data.images.push(imgEl ? imgEl.src : '');
       }
-      localStorage.setItem('parmel_grid_data', JSON.stringify(gridData));
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.error('Failed to save grid data to localStorage', e);
+      }
     }
 
-    // 起動時にローカルストレージから9マスやプロフィールの状態を復元
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedData = localStorage.getItem('parmel_grid_data');
-      if (savedData) {
-        try {
-          const gridData = JSON.parse(savedData);
-          gridData.forEach((item, i) => {
-            if (i === 2) {
-              const freeInput = document.getElementById('custom-free-label');
-              if (freeInput) freeInput.value = item.label || 'FREE';
-            }
-            if (item.image) {
-              const imgEl = document.getElementById(`g${i}`);
-              if (imgEl) {
-                imgEl.src = item.image;
-                imgEl.style.display = 'block';
-                if (i === 8) {
-                  imgEl.classList.add('has-image');
-                }
+    function loadGridDataFromStorage() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const data = JSON.parse(saved);
+
+        if (data.images && Array.isArray(data.images)) {
+          data.images.forEach((src, i) => {
+            const img = document.getElementById(`g${i}`);
+            if (img && src) {
+              img.src = src;
+              img.style.display = 'block';
+              if (i === 8) {
+                img.classList.add('has-image');
               }
             }
           });
-        } catch(e) { console.error('Grid data load error', e); }
+        }
+
+        if (data.freeLabel) {
+          const freeInput = document.getElementById('custom-free-label');
+          if (freeInput) {
+            freeInput.value = data.freeLabel;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load grid data from localStorage', e);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadGridDataFromStorage();
+
+      const freeInput = document.getElementById('custom-free-label');
+      if (freeInput) {
+        freeInput.addEventListener('input', () => {
+          saveGridDataToStorage();
+        });
       }
     });
+    // --------------------------------------------------------
 
     function toggleCardFlip(event) {
       if (['INPUT', 'BUTTON', 'A'].includes(event.target.tagName)) return;
@@ -879,7 +909,8 @@
           if (isPalmel) {
             img.classList.add('has-image');
           }
-          saveGridDataToStorage(); // 自動保存を実行しアルバムと連動
+          // 画像変更時にストレージへ保存する
+          saveGridDataToStorage();
         };
         r.readAsDataURL(input.files[0]);
       }
