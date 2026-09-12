@@ -50,7 +50,7 @@
       margin-top: 4px;
     }
 
-    /* 9マス Grid */
+    /* 9マス Grid (表示専用) */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -83,21 +83,11 @@
       z-index: 2;
     }
 
-    .grid-label-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
+    .grid-label-display {
       color: var(--gold);
-      font-family: inherit;
-      font-size: 0.58rem;
-      text-align: center;
-      width: 90%;
-      outline: none;
-      letter-spacing: 0.05em;
       font-weight: bold;
+      letter-spacing: 0.05em;
     }
-    .grid-label-input::placeholder { color: rgba(229, 192, 123, 0.4); }
-    .grid-label-input:focus { border-bottom-color: var(--gold); background: rgba(0, 0, 0, 0.3); }
 
     .grid-image-box {
       flex: 1;
@@ -105,7 +95,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
       position: relative;
       overflow: hidden;
     }
@@ -142,8 +131,6 @@
       text-align: center;
       padding: 0 2px;
     }
-
-    input[type="file"] { display: none; }
 
     /* 保存ボタン */
     .save-btn-container {
@@ -340,17 +327,17 @@
   <div class="app-viewport">
     <h1 class="page-title">ALBUM</h1>
 
-    <!-- 9マス Grid (固定HTML構造) -->
+    <!-- 9マス Grid (親のデータを表示する専用エリア) -->
     <div class="grid-container">
-      <div class="grid-item"><div class="grid-label">MONTHLY</div><label class="grid-image-box"><img id="g0"><input type="file" accept="image/*" onchange="previewGrid(this, 'g0', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">CHARMPOINT</div><label class="grid-image-box"><img id="g1"><input type="file" accept="image/*" onchange="previewGrid(this, 'g1', false)"></label></div>
-      <div class="grid-item"><div class="grid-label"><input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12"></div><label class="grid-image-box"><img id="g2"><input type="file" accept="image/*" onchange="previewGrid(this, 'g2', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">FOOD</div><label class="grid-image-box"><img id="g3"><input type="file" accept="image/*" onchange="previewGrid(this, 'g3', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">MAIN</div><label class="grid-image-box"><img id="g4"><input type="file" accept="image/*" onchange="previewGrid(this, 'g4', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">SLEEPING</div><label class="grid-image-box"><img id="g5"><input type="file" accept="image/*" onchange="previewGrid(this, 'g5', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">TOYS</div><label class="grid-image-box"><img id="g6"><input type="file" accept="image/*" onchange="previewGrid(this, 'g6', false)"></label></div>
-      <div class="grid-item"><div class="grid-label">FUNNYSHOT</div><label class="grid-image-box"><img id="g7"><input type="file" accept="image/*" onchange="previewGrid(this, 'g7', false)"></label></div>
-      <div class="grid-item palmel-item"><div class="grid-label">NOSE＋PALMEL</div><label class="grid-image-box"><img id="g8"><div class="palmel-overlay-logo">PALMEL</div><input type="file" accept="image/*" onchange="previewGrid(this, 'g8', true)"></label></div>
+      <div class="grid-item"><div class="grid-label">MONTHLY</div><div class="grid-image-box"><img id="view-g0"></div></div>
+      <div class="grid-item"><div class="grid-label">CHARMPOINT</div><div class="grid-image-box"><img id="view-g1"></div></div>
+      <div class="grid-item"><div class="grid-label"><span id="view-free-label" class="grid-label-display">FREE</span></div><div class="grid-image-box"><img id="view-g2"></div></div>
+      <div class="grid-item"><div class="grid-label">FOOD</div><div class="grid-image-box"><img id="view-g3"></div></div>
+      <div class="grid-item"><div class="grid-label">MAIN</div><div class="grid-image-box"><img id="view-g4"></div></div>
+      <div class="grid-item"><div class="grid-label">SLEEPING</div><div class="grid-image-box"><img id="view-g5"></div></div>
+      <div class="grid-item"><div class="grid-label">TOYS</div><div class="grid-image-box"><img id="view-g6"></div></div>
+      <div class="grid-item"><div class="grid-label">FUNNYSHOT</div><div class="grid-image-box"><img id="view-g7"></div></div>
+      <div class="grid-item palmel-item"><div class="grid-label">NOSE＋PALMEL</div><div class="grid-image-box"><img id="view-g8"><div class="palmel-overlay-logo">PALMEL</div></div></div>
     </div>
 
     <!-- アルバムに追加ボタン -->
@@ -380,85 +367,53 @@
     const HISTORY_KEY = 'parmel_album_history';
     const gridLabelsStatic = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
 
-    // 現在の入力状態の自動保存
-    function saveCurrentDraft() {
-      try {
-        const data = {
-          images: [],
-          freeLabel: document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE'
-        };
-        for (let i = 0; i < 9; i++) {
-          const imgEl = document.getElementById(`g${i}`);
-          data.images.push(imgEl ? imgEl.src : '');
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (e) {
-        console.error('Storage quota or error:', e);
-      }
-    }
-
-    // ドラフトの読み込み
-    function loadCurrentDraft() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return;
-        const data = JSON.parse(saved);
-        if (data.images && Array.isArray(data.images)) {
-          data.images.forEach((src, i) => {
-            const img = document.getElementById(`g${i}`);
-            if (img && src) {
-              img.src = src;
-              if (i === 8) img.classList.add('has-image');
-            }
-          });
-        }
-        if (data.freeLabel) {
-          const freeInput = document.getElementById('custom-free-label');
-          if (freeInput) freeInput.value = data.freeLabel;
-        }
-      } catch (e) {
-        console.error('Failed to load draft', e);
-      }
-    }
-
-    // 画像プレビュー時
-    window.previewGrid = function(input, imgId, isPalmel) {
-      if (input.files && input.files[0]) {
-        const r = new FileReader();
-        r.onload = e => {
-          const img = document.getElementById(imgId);
-          if (img) {
-            img.src = e.target.result;
-            if (isPalmel) img.classList.add('has-image');
-            saveCurrentDraft();
-          }
-        };
-        r.readAsDataURL(input.files[0]);
-      }
+    let currentAlbumData = {
+      images: Array(9).fill(''),
+      freeLabel: 'FREE'
     };
 
-    // 「アルバムに追加」ボタンの処理
+    function loadParentData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const data = JSON.parse(saved);
+          if (data.images) currentAlbumData.images = data.images;
+          if (data.freeLabel) currentAlbumData.freeLabel = data.freeLabel;
+        }
+      } catch (e) {
+        console.error('Failed to load parent data', e);
+      }
+
+      currentAlbumData.images.forEach((src, i) => {
+        const img = document.getElementById(`view-g${i}`);
+        if (img) {
+          img.src = src || '';
+          if (i === 8 && src) {
+            img.classList.add('has-image');
+          } else {
+            img.classList.remove('has-image');
+          }
+        }
+      });
+
+      const freeLblEl = document.getElementById('view-free-label');
+      if (freeLblEl) {
+        freeLblEl.innerText = currentAlbumData.freeLabel || 'FREE';
+      }
+    }
+
     function handleSaveAlbum() {
       const btn = document.getElementById('save-album-btn');
       if (!btn || btn.classList.contains('saved')) return;
-
-      const freeInput = document.getElementById('custom-free-label');
-      const freeLabelVal = freeInput ? freeInput.value : 'FREE';
-      
-      const currentImages = [];
-      for (let i = 0; i < 9; i++) {
-        const imgEl = document.getElementById(`g${i}`);
-        currentImages.push(imgEl ? imgEl.src : '');
-      }
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
 
       const newAlbum = {
-        id: Date.now() + Math.random().toString(36.substr(2, 4)), // ユニークIDを確実に生成
+        id: Date.now() + Math.random().toString(36).substr(2, 4),
         date: dateStr,
-        freeLabel: freeLabelVal,
-        images: currentImages
+        freeLabel: currentAlbumData.freeLabel,
+        images: [...currentAlbumData.images]
       };
 
       let history = [];
@@ -488,7 +443,6 @@
       }, 1500);
     }
 
-    // 履歴（PALMEL MEMORY）を画面に描画
     function renderHistory() {
       const container = document.getElementById('history-list-container');
       if (!container) return;
@@ -546,7 +500,6 @@
       });
     }
 
-    // 写真に保存する機能（html2canvas）
     window.saveToPhone = function(id) {
       const gridEl = document.getElementById(`history-grid-${id}`);
       if (!gridEl) return;
@@ -566,7 +519,6 @@
       });
     };
 
-    // 履歴の削除
     window.deleteHistoryItem = function(id) {
       if (!confirm('この保存アルバムを削除しますか？')) return;
       try {
@@ -579,22 +531,15 @@
       }
     };
 
-    // 初期化処理（ホーム画面追加時でも確実に行う）
     function initApp() {
-      loadCurrentDraft();
+      loadParentData();
       renderHistory();
 
       const saveBtn = document.getElementById('save-album-btn');
       if (saveBtn) {
-        // 既存のイベントの重複登録を防ぐためクローンして置換するか、直接設定
         saveBtn.replaceWith(saveBtn.cloneNode(true));
         const newSaveBtn = document.getElementById('save-album-btn');
         newSaveBtn.addEventListener('click', handleSaveAlbum);
-      }
-
-      const freeInput = document.getElementById('custom-free-label');
-      if (freeInput) {
-        freeInput.addEventListener('input', saveCurrentDraft);
       }
     }
 
