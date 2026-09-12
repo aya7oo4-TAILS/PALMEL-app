@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PARMEL - ALBUM</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- html2canvas ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
       --bg-main: #0b0d0e;
-      --card-bg: linear-gradient(135deg, #24292e 0%, #16181b 100%);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
       --text-main: #f5f6f8;
       --text-sub: #9aa0a6;
       --gold: #e5c07b;
@@ -43,80 +42,86 @@
       gap: 16px;
     }
 
-    .page-header {
+    .page-title {
       font-family: 'Cinzel', serif;
-      font-size: 1rem;
+      font-size: 0.9rem;
       letter-spacing: 0.2em;
       color: var(--gold);
       text-align: center;
-      margin-top: 8px;
-      margin-bottom: 4px;
+      margin-top: 4px;
     }
 
-    /* アルバムグリッド（3列表示） */
-    .album-grid {
+    /* 9マス Grid */
+    .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 6px;
       width: 100%;
     }
 
-    .album-item {
+    .grid-item {
       background: #15181b;
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
       aspect-ratio: 1 / 1.25;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
-    .album-label {
+    .grid-label {
       font-family: 'Cinzel', 'Noto Sans JP', serif;
       font-size: 0.58rem;
       letter-spacing: 0.1em;
       text-align: center;
-      padding: 5px 2px;
-      background: rgba(0, 0, 0, 0.5);
+      padding: 4px 2px;
+      background: rgba(0, 0, 0, 0.4);
       color: var(--text-sub);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    .album-image-box {
+    .grid-label-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
+      color: var(--gold);
+      font-family: inherit;
+      font-size: 0.58rem;
+      text-align: center;
+      width: 90%;
+      outline: none;
+      letter-spacing: 0.05em;
+      font-weight: bold;
+    }
+    .grid-label-input::placeholder { color: rgba(229, 192, 123, 0.4); }
+    .grid-label-input:focus { border-bottom-color: var(--gold); background: rgba(0, 0, 0, 0.3); }
+
+    .grid-image-box {
       flex: 1;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       position: relative;
       overflow: hidden;
-      background: #101214;
     }
 
-    .album-image-box img {
+    .grid-image-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
     }
 
-    .album-image-box img.has-image {
-      display: block;
+    .grid-item.palmel-item .grid-image-box {
+      position: relative;
     }
 
-    .album-placeholder {
-      color: rgba(255, 255, 255, 0.2);
-      font-size: 1.2rem;
-    }
-
-    .album-item.palmel-item .album-image-box img.has-image {
+    .grid-item.palmel-item .grid-image-box img.has-image {
       filter: brightness(0.45);
     }
 
@@ -139,54 +144,65 @@
       padding: 0 2px;
     }
 
+    input[type="file"] { display: none; }
+
     /* 保存ボタン */
-    .save-action-section {
+    .save-btn-container {
+      width: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: center;
       margin-top: 4px;
-      position: relative;
     }
 
-    .save-album-btn {
+    .save-btn {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #e5c07b 0%, #c49d55 100%);
+      background: linear-gradient(135deg, #e5c07b, #c8a25c);
       color: #0b0d0e;
       border: none;
-      border-radius: 12px;
+      border-radius: 8px;
       font-family: 'Cinzel', 'Noto Sans JP', serif;
+      font-size: 0.75rem;
       font-weight: 700;
-      font-size: 0.85rem;
       letter-spacing: 0.15em;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(229, 192, 123, 0.3);
+      box-shadow: 0 4px 12px rgba(229, 192, 123, 0.2);
       transition: all 0.2s ease;
     }
 
-    .save-album-btn:active {
-      opacity: 0.8;
+    .save-btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .save-btn.saved {
+      background: #2a2f35 !important;
+      color: var(--text-sub) !important;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
     }
 
     /* 履歴セクション */
     .history-section {
+      width: 100%;
+      margin-top: 24px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      margin-top: 24px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       padding-top: 20px;
     }
 
     .history-title {
       font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       letter-spacing: 0.15em;
       color: var(--text-sub);
       text-align: center;
     }
 
-    #history-list-container {
+    .history-list {
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -194,50 +210,118 @@
 
     .history-card {
       background: #15181b;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 16px 14px;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 8px;
+      position: relative;
     }
 
-    .history-card-header {
-      display: flex;
-      justify-content: space-between;
+    .history-header {
+      display: grid;
+      grid-template-columns: 75px 1fr 75px;
       align-items: center;
+      padding: 2px 0;
     }
+
+    .history-delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 0.6rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      text-align: left;
+    }
+    .history-delete-btn:hover { color: #ff6b6b; }
 
     .history-date {
-      font-size: 0.75rem;
+      text-align: center;
+      font-size: 0.78rem;
       color: var(--gold);
       font-family: 'Cinzel', serif;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
+      font-weight: 700;
     }
 
-    .delete-history-btn {
-      background: rgba(255, 80, 80, 0.1);
-      color: #ff6b6b;
-      border: 1px solid rgba(255, 80, 80, 0.25);
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 0.75rem;
+    .history-phone-save-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 0.6rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
+      padding: 2px 4px;
+      text-align: right;
+      justify-self: end;
     }
+    .history-phone-save-btn:hover { color: var(--text-main); }
 
-    .delete-history-btn:active {
-      background: rgba(255, 80, 80, 0.3);
-    }
-
+    /* 保存された履歴内のミニ9マスグリッド */
     .history-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 4px;
+      width: 100%;
+      background: #15181b;
+    }
+
+    .history-grid-item {
+      background: #0b0d0e;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 1 / 1.25;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .history-grid-label {
+      font-family: 'Cinzel', 'Noto Sans JP', serif;
+      font-size: 0.48rem;
+      letter-spacing: 0.05em;
+      text-align: center;
+      padding: 2px;
+      background: rgba(0, 0, 0, 0.5);
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-grid-image-box {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .history-grid-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .history-palmel-logo {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 0 8px rgba(229, 192, 123, 0.6);
+      pointer-events: none;
+    }
+    .history-grid-item.palmel-item img.has-image {
+      filter: brightness(0.45);
     }
 
     /* ボトムナビゲーション */
@@ -255,23 +339,49 @@
 <body>
 
   <div class="app-viewport">
-    <div class="page-header">MEMORY ALBUM</div>
+    <h1 class="page-title">ALBUM</h1>
 
-    <!-- 9マスアルバムグリッド -->
-    <div class="album-grid" id="album-grid-container">
-      <!-- JavaScript動的生成 -->
+    <!-- 9マス Grid -->
+    <div class="grid-container">
+      <script>
+        const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+        
+        gridLabels.forEach((lbl, i) => {
+          const labelHtml = (i === 2)
+            ? `<input type="text" id="custom-free-label" class="grid-label-input" value="FREE" placeholder="タイトル" maxlength="12">`
+            : lbl;
+
+          const isPalmel = (i === 8);
+          const extraClass = isPalmel ? ' palmel-item' : '';
+          const innerExtra = isPalmel ? `
+            <div class="palmel-overlay-logo">
+              PALMEL
+            </div>
+          ` : '';
+
+          document.write(`
+            <div class="grid-item${extraClass}">
+              <div class="grid-label">${labelHtml}</div>
+              <label class="grid-image-box">
+                <img id="g${i}">
+                ${innerExtra}
+                <input type="file" accept="image/*" onchange="previewGrid(this, 'g${i}', ${isPalmel})">
+              </label>
+            </div>`);
+        });
+      </script>
     </div>
 
-    <!-- 保存ボタンエリア -->
-    <div class="save-action-section">
-      <button class="save-album-btn" id="save-album-btn">SAVE CURRENT ALBUM</button>
+    <!-- 保存するボタン -->
+    <div class="save-btn-container">
+      <button id="save-album-btn" class="save-btn" onclick="saveAlbumToHistory()">アルバムに追加</button>
     </div>
 
-    <!-- 過去の保存履歴エリア -->
-    <div class="history-section" id="history-section">
-      <div class="history-title">SAVED MEMORIES</div>
-      <div id="history-list-container">
-        <!-- 履歴が動的生成されます -->
+    <!-- 過去に保存したアルバム一覧（下に蓄積） -->
+    <div class="history-section">
+      <h2 class="history-title">PALMEL MEMORY</h2>
+      <div class="history-list" id="history-list-container">
+        <!-- ここに保存されたアルバムがどんどん追加されます -->
       </div>
     </div>
   </div>
@@ -286,214 +396,203 @@
 
   <script>
     const STORAGE_KEY = 'parmel_grid_data';
-    const HISTORY_STORAGE_KEY = 'parmel_album_history';
-    const defaultLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+    const HISTORY_KEY = 'parmel_album_history';
+    const gridLabelsStatic = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
 
-    // 現在のデータを読み込むヘルパー
-    function fnGetCurrentData() {
-      let savedData = { images: Array(9).fill(''), freeLabel: 'FREE' };
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed.images) savedData.images = parsed.images;
-          if (parsed.freeLabel) savedData.freeLabel = parsed.freeLabel;
-        }
-      } catch (e) {
-        console.error('Failed to load storage data', e);
+    // 現在の入力状態の自動保存
+    function saveCurrentDraft() {
+      const data = {
+        images: [],
+        freeLabel: document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE'
+      };
+      for (let i = 0; i < 9; i++) {
+        const imgEl = document.getElementById(`g${i}`);
+        data.images.push(imgEl ? imgEl.src : '');
       }
-      return savedData;
-    };
-
-    // アルバム画面のレンダリング
-    function renderAlbum() {
-      const container = document.getElementById('album-grid-container');
-      container.innerHTML = '';
-
-      const savedData = fnGetCurrentData();
-
-      defaultLabels.forEach((label, i) => {
-        const currentLabel = (i === 2) ? (savedData.freeLabel || 'FREE') : label;
-        const imgSrc = savedData.images[i] || '';
-        const isPalmel = (i === 8);
-        const palmelClass = isPalmel ? ' palmel-item' : '';
-        const hasImgClass = imgSrc ? ' has-image' : '';
-
-        const palmelOverlayHtml = isPalmel ? `
-          <div class="palmel-overlay-logo">
-            PALMEL
-          </div>
-        ` : '';
-
-        const placeholderHtml = !imgSrc && !isPalmel ? `<div class="album-placeholder">📷</div>` : '';
-
-        const itemHtml = `
-          <div class="album-item${palmelClass}">
-            <div class="album-label">${currentLabel}</div>
-            <div class="album-image-box">
-              ${placeholderHtml}
-              <img src="${imgSrc}" class="${hasImgClass}" alt="${currentLabel}">
-              ${palmelOverlayHtml}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', itemHtml);
-      });
-
-      renderHistory();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    // 履歴のレンダリング
-    function renderHistory() {
-      const historyContainer = document.getElementById('history-list-container');
-      historyContainer.innerHTML = '';
-
-      let historyList = [];
+    function loadCurrentDraft() {
       try {
-        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
-        if (raw) historyList = JSON.parse(raw);
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        if (data.images && Array.isArray(data.images)) {
+          data.images.forEach((src, i) => {
+            const img = document.getElementById(`g${i}`);
+            if (img && src) {
+              img.src = src;
+              if (i === 8) img.classList.add('has-image');
+            }
+          });
+        }
+        if (data.freeLabel) {
+          const freeInput = document.getElementById('custom-free-label');
+          if (freeInput) freeInput.value = data.freeLabel;
+        }
       } catch (e) {
-        console.error('Failed to load history', e);
+        console.error('Failed to load draft', e);
+      }
+    }
+
+    // 画像プレビュー時
+    function previewGrid(input, imgId, isPalmel) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          const img = document.getElementById(imgId);
+          img.src = e.target.result;
+          if (isPalmel) img.classList.add('has-image');
+          saveCurrentDraft();
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // 「アルバムに追加」ボタンを押したときの処理 ＋ エフェクト
+    function saveAlbumToHistory() {
+      const btn = document.getElementById('save-album-btn');
+      if (btn.classList.contains('saved')) return;
+
+      const freeLabelVal = document.getElementById('custom-free-label') ? document.getElementById('custom-free-label').value : 'FREE';
+      
+      const currentImages = [];
+      for (let i = 0; i < 9; i++) {
+        const imgEl = document.getElementById(`g${i}`);
+        currentImages.push(imgEl ? imgEl.src : '');
       }
 
-      if (historyList.length === 0) {
-        historyContainer.innerHTML = `<div style="text-align:center; font-size:0.75rem; color:var(--text-sub); padding: 10px 0;">No saved memories yet.</div>`;
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+
+      const newAlbum = {
+        id: Date.now(),
+        date: dateStr,
+        freeLabel: freeLabelVal,
+        images: currentImages
+      };
+
+      let history = [];
+      try {
+        const savedHistory = localStorage.getItem(HISTORY_KEY);
+        if (savedHistory) history = JSON.parse(savedHistory);
+      } catch (e) {
+        console.error(e);
+      }
+
+      history.unshift(newAlbum);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+      renderHistory();
+
+      btn.classList.add('saved');
+      btn.innerText = '追加されました！';
+
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        btn.innerText = 'アルバムに追加';
+      }, 1500);
+    }
+
+    // 履歴を画面に描画
+    function renderHistory() {
+      const container = document.getElementById('history-list-container');
+      container.innerHTML = '';
+
+      let history = [];
+      try {
+        const savedHistory = localStorage.getItem(HISTORY_KEY);
+        if (savedHistory) history = JSON.parse(savedHistory);
+      } catch (e) {
+        console.error(e);
+      }
+
+      if (history.length === 0) {
+        container.innerHTML = `<div style="text-align: center; font-size: 0.65rem; color: var(--text-sub); padding: 10px;">追加されたアルバムはありません</div>`;
         return;
       }
 
-      historyList.forEach((historyItem, index) => {
+      history.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        card.id = `history-card-${item.id}`;
+
         let gridHtml = '';
-        defaultLabels.forEach((label, i) => {
-          const currentLabel = (i === 2) ? (historyItem.freeLabel || 'FREE') : label;
-          const imgSrc = historyItem.images[i] || '';
+        item.images.forEach((imgSrc, i) => {
+          const labelText = (i === 2) ? (item.freeLabel || 'FREE') : gridLabelsStatic[i];
           const isPalmel = (i === 8);
           const palmelClass = isPalmel ? ' palmel-item' : '';
-          const hasImgClass = imgSrc ? ' has-image' : '';
-
-          const palmelOverlayHtml = isPalmel ? `
-            <div class="palmel-overlay-logo" style="font-size:0.6rem;">
-              PALMEL
-            </div>
-          ` : '';
+          const palmelLogo = isPalmel ? `<div class="history-palmel-logo">PALMEL</div>` : '';
+          const imgTag = imgSrc ? `<img src="${imgSrc}" class="has-image">` : `<img src="">`;
 
           gridHtml += `
-            <div class="album-item${palmelClass}" style="aspect-ratio: 1 / 1.1;">
-              <div class="album-label" style="font-size:0.48rem; padding:3px 1px;">${currentLabel}</div>
-              <div class="album-image-box">
-                <img src="${imgSrc}" class="${hasImgClass}" alt="${currentLabel}">
-                ${palmelOverlayHtml}
+            <div class="history-grid-item${palmelClass}">
+              <div class="history-grid-label">${labelText}</div>
+              <div class="history-grid-image-box">
+                ${imgTag}
+                ${palmelLogo}
               </div>
             </div>
           `;
         });
 
-        const cardHtml = `
-          <div class="history-card">
-            <div class="history-card-header">
-              <button class="delete-history-btn" onclick="deleteHistory(${index})" title="削除">✕</button>
-              <span class="history-date">${historyItem.date}</span>
-            </div>
-            <div class="history-grid">
-              ${gridHtml}
-            </div>
+        card.innerHTML = `
+          <div class="history-header">
+            <button class="history-delete-btn" onclick="deleteHistoryItem(${item.id})">削除</button>
+            <span class="history-date">${item.date}</span>
+            <button class="history-phone-save-btn" onclick="saveToPhone(${item.id})">写真に保存</button>
+          </div>
+          <div class="history-grid" id="history-grid-${item.id}">
+            ${gridHtml}
           </div>
         `;
-        historyContainer.insertAdjacentHTML('beforeend', cardHtml);
+
+        container.appendChild(card);
       });
     }
 
-    let saveButtonTimer = null;
+    // 指定した保存アルバムを画像化してスマホの写真アプリに保存（ダウンロード）する機能
+    function saveToPhone(id) {
+      const gridEl = document.getElementById(`history-grid-${id}`);
+      if (!gridEl) return;
 
-    // 現在のアルバムを保存する処理
-    document.getElementById('save-album-btn').addEventListener('click', () => {
-      const btn = document.getElementById('save-album-btn');
-      
-      // 連打防止
-      if (btn.dataset.saving === 'true') return;
-      btn.dataset.saving = 'true';
+      html2canvas(gridEl, {
+        backgroundColor: '#0b0d0e',
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `PARMEL_Album_${id}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        console.error('画像保存に失敗しました', err);
+        alert('画像の保存に失敗しました');
+      });
+    }
 
-      const currentData = fnGetCurrentData();
-      
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const dateStr = `${yyyy}.${mm}.${dd}`;
-
-      const newHistoryItem = {
-        date: dateStr,
-        images: currentData.images,
-        freeLabel: currentData.freeLabel
-      };
-
-      let historyList = [];
-      try {
-        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
-        if (raw) historyList = JSON.parse(raw);
-      } catch (e) {
-        console.error('Failed to load history', e);
-      }
-
-      historyList.unshift(newHistoryItem);
-
-      try {
-        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyList));
-      } catch (e) {
-        console.error('Failed to save history', e);
-        alert('保存容量がいっぱいか、エラーが発生しました。');
-        btn.dataset.saving = 'false';
-        return;
-      }
-
-      renderHistory();
-
-      // ★ここできっちり見た目を変更する（インライン指定で確実反映）
-      btn.style.background = '#2a2e33';
-      btn.style.color = '#9aa0a6';
-      btn.style.boxShadow = 'none';
-      btn.textContent = '保存されました';
-
-      // 2秒後に元に戻す
-      if (saveButtonTimer) clearTimeout(saveButtonTimer);
-      saveButtonTimer = setTimeout(() => {
-        btn.style.background = 'linear-gradient(135deg, #e5c07b 0%, #c49d55 100%)';
-        btn.style.color = '#0b0d0e';
-        btn.style.boxShadow = '0 4px 16px rgba(229, 192, 123, 0.3)';
-        btn.textContent = 'SAVE CURRENT ALBUM';
-        btn.dataset.saving = 'false';
-      }, 2000);
-    });
-
-    // 履歴の削除処理
-    window.deleteHistory = function(index) {
+    // 履歴の削除
+    function deleteHistoryItem(id) {
       if (!confirm('この保存アルバムを削除しますか？')) return;
-
-      let historyList = [];
       try {
-        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
-        if (raw) historyList = JSON.parse(raw);
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        history = history.filter(item => item.id !== id);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        renderHistory();
       } catch (e) {
-        return;
+        console.error(e);
       }
-
-      historyList.splice(index, 1);
-
-      try {
-        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyList));
-      } catch (e) {
-        console.error('Failed to update history', e);
-      }
-
-      renderHistory();
-    };
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
-      renderAlbum();
-    });
+      loadCurrentDraft();
+      renderHistory();
 
-    window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY) {
-        renderAlbum();
+      const freeInput = document.getElementById('custom-free-label');
+      if (freeInput) {
+        freeInput.addEventListener('input', () => {
+          saveCurrentDraft();
+        });
       }
     });
   </script>
