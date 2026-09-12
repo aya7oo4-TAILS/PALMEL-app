@@ -111,13 +111,11 @@
       display: block;
     }
 
-    /* 未登録時のプレースホルダーアイコン */
     .album-placeholder {
       color: rgba(255, 255, 255, 0.2);
       font-size: 1.2rem;
     }
 
-    /* 右下「NOSE＋PALMEL」専用のデザイン演出 */
     .album-item.palmel-item .album-image-box img.has-image {
       filter: brightness(0.45);
     }
@@ -141,12 +139,105 @@
       padding: 0 2px;
     }
 
-    .palmel-overlay-sub {
-      font-size: 0.38rem;
-      letter-spacing: 0.25em;
+    /* 保存ボタン */
+    .save-action-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      position: relative;
+    }
+
+    .save-album-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #e5c07b 0%, #c49d55 100%);
+      color: #0b0d0e;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Cinzel', 'Noto Sans JP', serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(229, 192, 123, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .save-album-btn:active {
+      opacity: 0.8;
+    }
+
+    /* 履歴セクション */
+    .history-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+
+    .history-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--text-sub);
+      text-align: center;
+    }
+
+    #history-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .history-card {
+      background: #15181b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .history-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-date {
+      font-size: 0.75rem;
       color: var(--gold);
-      margin-top: 2px;
-      opacity: 0.85;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.05em;
+    }
+
+    .delete-history-btn {
+      background: rgba(255, 80, 80, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 80, 80, 0.25);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .delete-history-btn:active {
+      background: rgba(255, 80, 80, 0.3);
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
 
     /* ボトムナビゲーション */
@@ -170,6 +261,19 @@
     <div class="album-grid" id="album-grid-container">
       <!-- JavaScript動的生成 -->
     </div>
+
+    <!-- 保存ボタンエリア -->
+    <div class="save-action-section">
+      <button class="save-album-btn" id="save-album-btn">SAVE CURRENT ALBUM</button>
+    </div>
+
+    <!-- 過去の保存履歴エリア -->
+    <div class="history-section" id="history-section">
+      <div class="history-title">SAVED MEMORIES</div>
+      <div id="history-list-container">
+        <!-- 履歴が動的生成されます -->
+      </div>
+    </div>
   </div>
 
   <!-- ボトムナビゲーション -->
@@ -182,13 +286,11 @@
 
   <script>
     const STORAGE_KEY = 'parmel_grid_data';
+    const HISTORY_STORAGE_KEY = 'parmel_album_history';
     const defaultLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
 
-    function renderAlbum() {
-      const container = document.getElementById('album-grid-container');
-      container.innerHTML = '';
-
-      // ローカルストレージからホーム画面と同期されたデータを取得
+    // 現在のデータを読み込むヘルパー
+    function fnGetCurrentData() {
       let savedData = { images: Array(9).fill(''), freeLabel: 'FREE' };
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -200,6 +302,15 @@
       } catch (e) {
         console.error('Failed to load storage data', e);
       }
+      return savedData;
+    };
+
+    // アルバム画面のレンダリング
+    function renderAlbum() {
+      const container = document.getElementById('album-grid-container');
+      container.innerHTML = '';
+
+      const savedData = fnGetCurrentData();
 
       defaultLabels.forEach((label, i) => {
         const currentLabel = (i === 2) ? (savedData.freeLabel || 'FREE') : label;
@@ -211,7 +322,6 @@
         const palmelOverlayHtml = isPalmel ? `
           <div class="palmel-overlay-logo">
             PALMEL
-            <span class="palmel-overlay-sub">SPECIAL</span>
           </div>
         ` : '';
 
@@ -229,13 +339,158 @@
         `;
         container.insertAdjacentHTML('beforeend', itemHtml);
       });
+
+      renderHistory();
     }
+
+    // 履歴のレンダリング
+    function renderHistory() {
+      const historyContainer = document.getElementById('history-list-container');
+      historyContainer.innerHTML = '';
+
+      let historyList = [];
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (raw) historyList = JSON.parse(raw);
+      } catch (e) {
+        console.error('Failed to load history', e);
+      }
+
+      if (historyList.length === 0) {
+        historyContainer.innerHTML = `<div style="text-align:center; font-size:0.75rem; color:var(--text-sub); padding: 10px 0;">No saved memories yet.</div>`;
+        return;
+      }
+
+      historyList.forEach((historyItem, index) => {
+        let gridHtml = '';
+        defaultLabels.forEach((label, i) => {
+          const currentLabel = (i === 2) ? (historyItem.freeLabel || 'FREE') : label;
+          const imgSrc = historyItem.images[i] || '';
+          const isPalmel = (i === 8);
+          const palmelClass = isPalmel ? ' palmel-item' : '';
+          const hasImgClass = imgSrc ? ' has-image' : '';
+
+          const palmelOverlayHtml = isPalmel ? `
+            <div class="palmel-overlay-logo" style="font-size:0.6rem;">
+              PALMEL
+            </div>
+          ` : '';
+
+          gridHtml += `
+            <div class="album-item${palmelClass}" style="aspect-ratio: 1 / 1.1;">
+              <div class="album-label" style="font-size:0.48rem; padding:3px 1px;">${currentLabel}</div>
+              <div class="album-image-box">
+                <img src="${imgSrc}" class="${hasImgClass}" alt="${currentLabel}">
+                ${palmelOverlayHtml}
+              </div>
+            </div>
+          `;
+        });
+
+        const cardHtml = `
+          <div class="history-card">
+            <div class="history-card-header">
+              <button class="delete-history-btn" onclick="deleteHistory(${index})" title="削除">✕</button>
+              <span class="history-date">${historyItem.date}</span>
+            </div>
+            <div class="history-grid">
+              ${gridHtml}
+            </div>
+          </div>
+        `;
+        historyContainer.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    let saveButtonTimer = null;
+
+    // 現在のアルバムを保存する処理
+    document.getElementById('save-album-btn').addEventListener('click', () => {
+      const btn = document.getElementById('save-album-btn');
+      
+      // 連打防止
+      if (btn.dataset.saving === 'true') return;
+      btn.dataset.saving = 'true';
+
+      const currentData = fnGetCurrentData();
+      
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}.${mm}.${dd}`;
+
+      const newHistoryItem = {
+        date: dateStr,
+        images: currentData.images,
+        freeLabel: currentData.freeLabel
+      };
+
+      let historyList = [];
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (raw) historyList = JSON.parse(raw);
+      } catch (e) {
+        console.error('Failed to load history', e);
+      }
+
+      historyList.unshift(newHistoryItem);
+
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyList));
+      } catch (e) {
+        console.error('Failed to save history', e);
+        alert('保存容量がいっぱいか、エラーが発生しました。');
+        btn.dataset.saving = 'false';
+        return;
+      }
+
+      renderHistory();
+
+      // ★ここできっちり見た目を変更する（インライン指定で確実反映）
+      btn.style.background = '#2a2e33';
+      btn.style.color = '#9aa0a6';
+      btn.style.boxShadow = 'none';
+      btn.textContent = '保存されました';
+
+      // 2秒後に元に戻す
+      if (saveButtonTimer) clearTimeout(saveButtonTimer);
+      saveButtonTimer = setTimeout(() => {
+        btn.style.background = 'linear-gradient(135deg, #e5c07b 0%, #c49d55 100%)';
+        btn.style.color = '#0b0d0e';
+        btn.style.boxShadow = '0 4px 16px rgba(229, 192, 123, 0.3)';
+        btn.textContent = 'SAVE CURRENT ALBUM';
+        btn.dataset.saving = 'false';
+      }, 2000);
+    });
+
+    // 履歴の削除処理
+    window.deleteHistory = function(index) {
+      if (!confirm('この保存アルバムを削除しますか？')) return;
+
+      let historyList = [];
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (raw) historyList = JSON.parse(raw);
+      } catch (e) {
+        return;
+      }
+
+      historyList.splice(index, 1);
+
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyList));
+      } catch (e) {
+        console.error('Failed to update history', e);
+      }
+
+      renderHistory();
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
       renderAlbum();
     });
 
-    // 別タブやホーム画面等でストレージが更新された時に即時反映させる
     window.addEventListener('storage', (e) => {
       if (e.key === STORAGE_KEY) {
         renderAlbum();
