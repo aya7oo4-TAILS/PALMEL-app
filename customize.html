@@ -26,10 +26,9 @@
       background: var(--bg-main);
       color: var(--text-main);
       font-family: 'Noto Sans JP', sans-serif;
-      overflow: hidden; /* 全体のスクロールを固定し、内部のスクロールエリアで制御 */
+      overflow: hidden;
     }
 
-    /* 画面全体を固定レイアウトにするコンテナ */
     .app-viewport {
       position: relative;
       width: 100%;
@@ -63,7 +62,49 @@
       font-weight: bold;
     }
 
-    /* 【固定エリア】常に画面上部に表示されるプレビュー用PALCARD */
+    /* 上部セグメントタブ (PALCARD / 9マス) */
+    .top-sub-nav {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 3px;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .sub-nav-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-family: 'Cinzel', 'Noto Sans JP', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 8px 0;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      letter-spacing: 0.05em;
+    }
+
+    .sub-nav-btn.active {
+      background: var(--gold);
+      color: #0b0d0e;
+      box-shadow: 0 4px 12px rgba(229, 192, 123, 0.3);
+    }
+
+    .custom-tab-content {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .custom-tab-content.active {
+      display: flex;
+    }
+
+    /* 【PALCARD用】固定プレビューエリア */
     .preview-fixed-area {
       width: 100%;
       flex-shrink: 0;
@@ -197,19 +238,19 @@
     .palcard.theme-midnight { background: linear-gradient(135deg, #162235 0%, #0a0e14 100%); }
     .palcard.theme-rose { background: linear-gradient(135deg, #331d25 0%, #140a0e 100%); }
 
-    /* PALCARD縁（Card Edge）のスタイル（デフォルト・カスタム） */
+    /* PALCARD縁（Card Edge） */
     .palcard.cardedge-none { border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--card-shadow); }
     .palcard.cardedge-gold { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(229, 192, 123, 0.35), var(--card-shadow); }
     .palcard.cardedge-neon { border: 2px solid #00f2fe; box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), var(--card-shadow); }
     .palcard.cardedge-ruby { border: 2px solid #ff758c; box-shadow: 0 0 20px rgba(255, 117, 140, 0.45), var(--card-shadow); }
 
-    /* アバターフレーム バリエーション */
+    /* アバターフレーム */
     .avatar-wrapper.frame-none { background: var(--avatar-bg); padding: 3px; box-shadow: none; }
     .avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); padding: 4px; box-shadow: 0 0 12px rgba(229,192,123,0.5); }
     .avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); padding: 4px; box-shadow: 0 0 12px rgba(0,242,254,0.5); }
     .avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); padding: 4px; box-shadow: 0 0 12px rgba(255,117,140,0.5); }
 
-    /* 称号スタイル（キラキラ） */
+    /* 称号スタイル */
     .sparkle-text {
       background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
       -webkit-background-clip: text;
@@ -217,7 +258,7 @@
       filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
     }
 
-    /* 【スクロールエリア】ここだけがスワイプ（スクロール）する */
+    /* スクロールエリア共通 */
     .scrollable-controls {
       flex: 1;
       overflow-y: auto;
@@ -228,10 +269,66 @@
       -webkit-overflow-scrolling: touch;
     }
     .scrollable-controls::-webkit-scrollbar {
-      display: none; /* スクロールバー非表示 */
+      display: none;
     }
 
-    /* コントロールパネルUI */
+    /* 【9マス用】スクロール内に配置するプレビューのスタイル */
+    .grid-preview-wrapper {
+      width: 100%;
+      background: #14171a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+      flex-shrink: 0;
+    }
+    .grid-container-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .grid-item-preview {
+      background: #15181b;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 1 / 1.25;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.3s ease;
+    }
+    .grid-label-preview {
+      font-family: 'Cinzel', 'Noto Sans JP', serif;
+      font-size: 0.45rem;
+      letter-spacing: 0.05em;
+      text-align: center;
+      padding: 3px 1px;
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-sub);
+    }
+    .grid-image-preview {
+      flex: 1;
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* 9マス フレームスタイル バリエーション */
+    .grid-container-preview.gridframe-standard .grid-item-preview {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .grid-container-preview.gridframe-gold .grid-item-preview {
+      border: 1.5px solid var(--gold);
+    }
+    .grid-container-preview.gridframe-neon .grid-item-preview {
+      border: 1.5px solid #00f2fe;
+    }
+    .grid-container-preview.gridframe-dark .grid-item-preview {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #0d0f11;
+    }
+
     .customize-section {
       background: #14171a;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -297,87 +394,120 @@
       <div style="width: 50px;"></div>
     </div>
 
-    <!-- 【固定エリア】スクロールしても絶対に画面から切れないプレビュー用PALCARD -->
-    <div class="preview-fixed-area">
-      <div class="palcard-container">
-        <div class="palcard theme-dark cardedge-none" id="preview-palcard">
-          <div class="palcard-brand">PALCARD</div>
-          <div class="palcard-body">
-            <div class="profile-info">
-              <div id="preview-title" class="user-title-display">FIRST PAL</div>
-              <div class="pet-name">MEL</div>
-              <div class="profile-fields">
-                <div class="field-row"><span class="field-label">生年月日</span><div class="field-value">2026.02.10</div></div>
-                <div class="field-row"><span class="field-label">nickname</span><div class="field-value">メルちゃん</div></div>
-                <div class="field-row"><span class="field-label">message</span><div class="field-value">こんにちは</div></div>
-                <div class="field-row"><span class="field-label">pallike</span><div class="field-value" style="color:var(--gold); font-weight:bold;">♡ 0</div></div>
-              </div>
-            </div>
-            
-            <div class="right-avatar-container">
-              <div class="avatar-wrapper frame-none" id="preview-avatar">
-                <div class="avatar-inner"><img src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"></div>
-              </div>
-            </div>
-          </div>
+    <!-- 上部セグメントタブ (PALCARD / 9マス) -->
+    <div class="top-sub-nav">
+      <button class="sub-nav-btn active" id="tab-btn-palcard" onclick="switchCustomTab('palcard')">PALCARD</button>
+      <button class="sub-nav-btn" id="tab-btn-grid" onclick="switchCustomTab('grid')">9マス</button>
+    </div>
 
-          <div class="palcard-footer">
-            <div class="footer-left-group">
-              <button class="icon-btn"><span>PALINK</span></button>
-              <button class="icon-btn"><span>GET</span></button>
+    <!-- [1] PALCARDカスタム タブコンテンツ (プレビュー固定) -->
+    <div id="tab-content-palcard" class="custom-tab-content active">
+      <div class="preview-fixed-area">
+        <div class="palcard-container">
+          <div class="palcard theme-dark cardedge-none" id="preview-palcard">
+            <div class="palcard-brand">PALCARD</div>
+            <div class="palcard-body">
+              <div class="profile-info">
+                <div id="preview-title" class="user-title-display">FIRST PAL</div>
+                <div class="pet-name">MEL</div>
+                <div class="profile-fields">
+                  <div class="field-row"><span class="field-label">生年月日</span><div class="field-value">2026.02.10</div></div>
+                  <div class="field-row"><span class="field-label">nickname</span><div class="field-value">メルちゃん</div></div>
+                  <div class="field-row"><span class="field-label">message</span><div class="field-value">こんにちは</div></div>
+                  <div class="field-row"><span class="field-label">pallike</span><div class="field-value" style="color:var(--gold); font-weight:bold;">♡ 0</div></div>
+                </div>
+              </div>
+              
+              <div class="right-avatar-container">
+                <div class="avatar-wrapper frame-none" id="preview-avatar">
+                  <div class="avatar-inner"><img src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="palcard-footer">
+              <div class="footer-left-group">
+                <button class="icon-btn"><span>PALINK</span></button>
+                <button class="icon-btn"><span>GET</span></button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="scrollable-controls" style="margin-top: 12px;">
+        <div class="customize-section">
+          <div class="section-title">PALCARD テーマ</div>
+          <div class="option-grid" id="theme-options">
+            <button class="option-btn active" data-type="theme" data-value="theme-dark">標準</button>
+            <button class="option-btn" data-type="theme" data-value="theme-gold">ゴールド</button>
+            <button class="option-btn" data-type="theme" data-value="theme-midnight">ミッドナイト</button>
+            <button class="option-btn" data-type="theme" data-value="theme-rose">ローズ</button>
+          </div>
+        </div>
+
+        <div class="customize-section">
+          <div class="section-title">カード縁（エッジ）</div>
+          <div class="option-grid" id="cardedge-options">
+            <button class="option-btn active" data-type="cardEdge" data-value="cardedge-none">標準</button>
+            <button class="option-btn" data-type="cardEdge" data-value="cardedge-gold">ゴールド</button>
+            <button class="option-btn" data-type="cardEdge" data-value="cardedge-neon">ネオン</button>
+            <button class="option-btn" data-type="cardEdge" data-value="cardedge-ruby">ルビー</button>
+          </div>
+        </div>
+
+        <div class="customize-section">
+          <div class="section-title">アバターフレーム</div>
+          <div class="option-grid" id="frame-options">
+            <button class="option-btn active" data-type="frame" data-value="frame-none">なし</button>
+            <button class="option-btn" data-type="frame" data-value="frame-gold">黄金縁</button>
+            <button class="option-btn" data-type="frame" data-value="frame-neon">ネオン</button>
+            <button class="option-btn" data-type="frame" data-value="frame-ruby">ルビー</button>
+          </div>
+        </div>
+
+        <div class="customize-section">
+          <div class="section-title">称号設定</div>
+          <div class="option-grid" style="grid-template-columns: repeat(2, 1fr);" id="title-options">
+            <button class="option-btn active" data-type="title" data-value="FIRST PAL">FIRST PAL</button>
+            <button class="option-btn sparkle-text" data-type="title" data-value="GOD">🌟 GOD 🌟</button>
+          </div>
+        </div>
+
+        <button class="save-config-btn" onclick="saveCustomization()">着せ替えを保存する</button>
       </div>
     </div>
 
-    <!-- 【スクロールエリア】ここの中身だけがスワイプして動く -->
-    <div class="scrollable-controls">
-      
-      <!-- 着せ替えコントロール：1. PALCARDテーマ -->
-      <div class="customize-section">
-        <div class="section-title">PALCARD テーマ</div>
-        <div class="option-grid" id="theme-options">
-          <button class="option-btn active" data-type="theme" data-value="theme-dark">標準</button>
-          <button class="option-btn" data-type="theme" data-value="theme-gold">ゴールド</button>
-          <button class="option-btn" data-type="theme" data-value="theme-midnight">ミッドナイト</button>
-          <button class="option-btn" data-type="theme" data-value="theme-rose">ローズ</button>
+    <!-- [2] 9マスカスタム タブコンテンツ (プレビューもスクロール領域へ配置) -->
+    <div id="tab-content-grid" class="custom-tab-content">
+      <div class="scrollable-controls">
+        <div class="grid-preview-wrapper">
+          <div class="section-title">PREVIEW</div>
+          <div class="grid-container-preview gridframe-standard" id="preview-grid-container">
+            <div class="grid-item-preview"><div class="grid-label-preview">MONTHLY</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">CHARM</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">FREE</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">FOOD</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">MAIN</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">SLEEP</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">TOYS</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">FUNNY</div><div class="grid-image-preview"></div></div>
+            <div class="grid-item-preview"><div class="grid-label-preview">PALMEL</div><div class="grid-image-preview"></div></div>
+          </div>
         </div>
-      </div>
 
-      <!-- 着せ替えコントロール：2. カード縁（Card Edge） -->
-      <div class="customize-section">
-        <div class="section-title">カード縁（エッジ）</div>
-        <div class="option-grid" id="cardedge-options">
-          <button class="option-btn active" data-type="cardEdge" data-value="cardedge-none">標準</button>
-          <button class="option-btn" data-type="cardEdge" data-value="cardedge-gold">ゴールド</button>
-          <button class="option-btn" data-type="cardEdge" data-value="cardedge-neon">ネオン</button>
-          <button class="option-btn" data-type="cardEdge" data-value="cardedge-ruby">ルビー</button>
+        <div class="customize-section">
+          <div class="section-title">9マス フレームスタイル</div>
+          <div class="option-grid" id="gridframe-options" style="grid-template-columns: repeat(2, 1fr);">
+            <button class="option-btn active" data-type="gridFrame" data-value="gridframe-standard">スタンダード</button>
+            <button class="option-btn" data-type="gridFrame" data-value="gridframe-gold">ゴールド枠</button>
+            <button class="option-btn" data-type="gridFrame" data-value="gridframe-neon">ネオン枠</button>
+            <button class="option-btn" data-type="gridFrame" data-value="gridframe-dark">ダークマット</button>
+          </div>
         </div>
+
+        <button class="save-config-btn" onclick="saveCustomization()">着せ替えを保存する</button>
       </div>
-
-      <!-- 着せ替えコントロール：3. アバターフレーム -->
-      <div class="customize-section">
-        <div class="section-title">アバターフレーム</div>
-        <div class="option-grid" id="frame-options">
-          <button class="option-btn active" data-type="frame" data-value="frame-none">なし</button>
-          <button class="option-btn" data-type="frame" data-value="frame-gold">黄金縁</button>
-          <button class="option-btn" data-type="frame" data-value="frame-neon">ネオン</button>
-          <button class="option-btn" data-type="frame" data-value="frame-ruby">ルビー</button>
-        </div>
-      </div>
-
-      <!-- 着せ替えコントロール：4. 称号 -->
-      <div class="customize-section">
-        <div class="section-title">称号設定</div>
-        <div class="option-grid" style="grid-template-columns: repeat(2, 1fr);" id="title-options">
-          <button class="option-btn active" data-type="title" data-value="FIRST PAL">FIRST PAL</button>
-          <button class="option-btn sparkle-text" data-type="title" data-value="GOD">🌟 GOD 🌟</button>
-        </div>
-      </div>
-
-      <button class="save-config-btn" onclick="saveCustomization()">着せ替えを保存する</button>
-
     </div>
 
   </div>
@@ -387,8 +517,28 @@
       theme: 'theme-dark',
       cardEdge: 'cardedge-none',
       frame: 'frame-none',
-      title: 'FIRST PAL'
+      title: 'FIRST PAL',
+      gridFrame: 'gridframe-standard'
     };
+
+    function switchCustomTab(tabName) {
+      const btnPalcard = document.getElementById('tab-btn-palcard');
+      const btnGrid = document.getElementById('tab-btn-grid');
+      const contentPalcard = document.getElementById('tab-content-palcard');
+      const contentGrid = document.getElementById('tab-content-grid');
+
+      if (tabName === 'palcard') {
+        btnPalcard.classList.add('active');
+        btnGrid.classList.remove('active');
+        contentPalcard.classList.add('active');
+        contentGrid.classList.remove('active');
+      } else {
+        btnGrid.classList.add('active');
+        btnPalcard.classList.remove('active');
+        contentGrid.classList.add('active');
+        contentPalcard.classList.remove('active');
+      }
+    }
 
     document.querySelectorAll('.option-grid').forEach(grid => {
       grid.addEventListener('click', (e) => {
@@ -407,6 +557,7 @@
     });
 
     function updatePreview() {
+      // 1. PALCARDプレビュー更新
       const card = document.getElementById('preview-palcard');
       const avatar = document.getElementById('preview-avatar');
       const titleEl = document.getElementById('preview-title');
@@ -420,6 +571,10 @@
       } else {
         titleEl.classList.remove('sparkle-text');
       }
+
+      // 2. 9マスプレビュー更新
+      const gridPreviewContainer = document.getElementById('preview-grid-container');
+      gridPreviewContainer.className = `grid-container-preview ${currentConfig.gridFrame || 'gridframe-standard'}`;
     }
 
     function saveCustomization() {
