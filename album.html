@@ -69,6 +69,21 @@
       border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
+    /* 9マス フレームスタイル バリエーション */
+    .grid-container.gridframe-standard .grid-item {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .grid-container.gridframe-gold .grid-item {
+      border: 1.5px solid var(--gold);
+    }
+    .grid-container.gridframe-neon .grid-item {
+      border: 1.5px solid #00f2fe;
+    }
+    .grid-container.gridframe-dark .grid-item {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #0d0f11;
+    }
+
     .grid-label {
       font-family: 'Cinzel', 'Noto Sans JP', serif;
       font-size: 0.58rem;
@@ -328,7 +343,7 @@
     <h1 class="page-title">ALBUM</h1>
 
     <!-- 9マス Grid (親のデータを表示する専用エリア) -->
-    <div class="grid-container">
+    <div class="grid-container gridframe-standard">
       <div class="grid-item"><div class="grid-label">MONTHLY</div><div class="grid-image-box"><img id="view-g0"></div></div>
       <div class="grid-item"><div class="grid-label">CHARMPOINT</div><div class="grid-image-box"><img id="view-g1"></div></div>
       <div class="grid-item"><div class="grid-label"><span id="view-free-label" class="grid-label-display">FREE</span></div><div class="grid-image-box"><img id="view-g2"></div></div>
@@ -380,6 +395,17 @@
           if (data.images) currentAlbumData.images = data.images;
           if (data.freeLabel) currentAlbumData.freeLabel = data.freeLabel;
         }
+
+        // 着せ替え設定から9マスのフレームスタイルを反映する処理
+        const customSaved = localStorage.getItem('parmel_custom_config');
+        if (customSaved) {
+          const config = JSON.parse(customSaved);
+          const gridContainer = document.querySelector('.grid-container');
+          if (gridContainer && config.gridFrame) {
+            gridContainer.classList.remove('gridframe-standard', 'gridframe-gold', 'gridframe-neon', 'gridframe-dark');
+            gridContainer.classList.add(config.gridFrame);
+          }
+        }
       } catch (e) {
         console.error('Failed to load parent data', e);
       }
@@ -413,7 +439,7 @@
         img.crossOrigin = 'anonymous';
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 300; // 300px角に縮小（アルバムのミニ表示ならこれで十分綺麗です）
+          const MAX_SIZE = 300;
           let width = img.width;
           let height = img.height;
           if (width > height) {
@@ -431,7 +457,6 @@
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          // 画質0.7のJPEGに変換して容量を大幅カット
           resolve(canvas.toDataURL('image/jpeg', 0.7));
         };
         img.onerror = () => resolve(src);
@@ -445,7 +470,6 @@
 
       btn.innerText = '保存中...';
 
-      // 9枚の画像をすべて軽量に圧縮
       const compressedImages = await Promise.all(
         currentAlbumData.images.map(img => compressImage(img))
       );
@@ -470,7 +494,6 @@
 
       history.unshift(newAlbum);
 
-      // 万が一また容量がいっぱいになったときのガード
       try {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
       } catch (e) {
