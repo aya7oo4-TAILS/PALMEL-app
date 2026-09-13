@@ -428,7 +428,7 @@
       }
     }
 
-    // 画像を圧縮して軽量なBase64に変換する関数
+    // 画像をさらにしっかり圧縮・スリム化するヘルパー関数
     function compressImage(src) {
       return new Promise((resolve) => {
         if (!src || !src.startsWith('data:image')) {
@@ -439,7 +439,7 @@
         img.crossOrigin = 'anonymous';
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 300;
+          const MAX_SIZE = 400; // 解像度を抑えてデータ量をスリム化
           let width = img.width;
           let height = img.height;
           if (width > height) {
@@ -457,7 +457,7 @@
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.7));
+          resolve(canvas.toDataURL('image/jpeg', 0.65)); // 画質0.65で圧縮
         };
         img.onerror = () => resolve(src);
         img.src = src;
