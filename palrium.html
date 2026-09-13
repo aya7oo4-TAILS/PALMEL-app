@@ -15,7 +15,9 @@
       --text-main: #f5f6f8;
       --text-sub: #9aa0a6;
       --gold: #e5c07b;
-      --radius-card: 18px;
+      --radius-card: 16px; /* カード全体の丸みをアップ */
+      --radius-grid: 12px;  /* 9マスの丸みもアップ */
+      --radius-switch: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -66,7 +68,7 @@
       gap: 4px;
       background: rgba(255, 255, 255, 0.05);
       padding: 3px;
-      border-radius: 8px;
+      border-radius: var(--radius-switch);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -76,7 +78,7 @@
       color: var(--text-sub);
       width: 26px;
       height: 26px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 0.65rem;
       cursor: pointer;
       display: flex;
@@ -128,7 +130,6 @@
     }
     .layout-2 .palcard {
       padding: 8px 10px;
-      border-radius: 12px;
     }
     .layout-2 .palcard-brand { font-size: 0.42rem; letter-spacing: 0.2em; margin-bottom: 0px; }
     .layout-2 .user-title-display { font-size: 0.48rem; margin-top: 1px; margin-bottom: 0px; min-height: 0.5rem; }
@@ -310,7 +311,7 @@
 
     /* 個別ホーム画面の9マスグリッド */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin-top: 4px; }
-    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); transition: all 0.3s ease; }
+    .grid-item { background: #15181b; border-radius: var(--radius-grid); display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); transition: all 0.3s ease; }
     .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
     .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
     .grid-image-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -373,6 +374,39 @@
   <script>
     const STORAGE_KEY = 'parmel_exchanged_pals';
     const gridLabelsStatic = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+
+    const customThemes = [
+      {
+        cardBg: 'linear-gradient(135deg, #2c1618 0%, #161012 100%)',
+        cardBorder: 'rgba(229, 115, 115, 0.3)',
+        radiusCard: '16px',
+        avatarBg: 'linear-gradient(135deg, #e57373, rgba(255,255,255,0.1))'
+      },
+      {
+        cardBg: 'linear-gradient(135deg, #12222d 0%, #0d141b 100%)',
+        cardBorder: 'rgba(92, 168, 229, 0.3)',
+        radiusCard: '16px',
+        avatarBg: 'linear-gradient(135deg, #5ca8e5, rgba(255,255,255,0.1))'
+      },
+      {
+        cardBg: 'linear-gradient(135deg, #282115 0%, #16140e 100%)',
+        cardBorder: 'rgba(229, 192, 123, 0.4)',
+        radiusCard: '16px',
+        avatarBg: 'linear-gradient(135deg, #e5c07b, rgba(255,255,255,0.05))'
+      },
+      {
+        cardBg: 'linear-gradient(135deg, #1c1828 0%, #121018 100%)',
+        cardBorder: 'rgba(179, 136, 235, 0.3)',
+        radiusCard: '16px',
+        avatarBg: 'linear-gradient(135deg, #b388eb, rgba(255,255,255,0.1))'
+      },
+      {
+        cardBg: 'linear-gradient(135deg, #15291e 0%, #0e1812 100%)',
+        cardBorder: 'rgba(129, 199, 132, 0.3)',
+        radiusCard: '16px',
+        avatarBg: 'linear-gradient(135deg, #81c784, rgba(255,255,255,0.1))'
+      }
+    ];
 
     const dummyPals = [
       {
@@ -513,23 +547,12 @@
     };
 
     function loadExchangedPals() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      let savedMap = {};
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          parsed.forEach(p => {
-            if (p.id) savedMap[p.id] = p;
-          });
-        } catch(e) {}
-      }
-
-      currentPalsData = dummyPals.map(pal => {
-        // アバターは常に最新の dummyPals（バラバラの画像）を優先し、9マスの画像だけ保存データを引き継ぐ
-        const savedPal = savedMap[pal.id];
+      currentPalsData = dummyPals.map((pal, index) => {
+        const theme = customThemes[index % customThemes.length];
         return {
           ...pal,
-          images: (savedPal && savedPal.images) ? savedPal.images : pal.images
+          theme: theme,
+          images: pal.images
         };
       });
 
@@ -546,13 +569,14 @@
 
       currentPalsData.forEach((pal, index) => {
         const badgeHtml = pal.isUpdated ? `<div class="new-badge">❗️</div>` : '';
+        const t = pal.theme;
 
         const itemBox = document.createElement('div');
         itemBox.innerHTML = `
           <div class="palcard-container" onclick="openPalDetail(${index})">
             ${badgeHtml}
             <div class="palcard-flipper">
-              <div class="palcard">
+              <div class="palcard" style="background: ${t.cardBg}; border-color: ${t.cardBorder}; border-radius: ${t.radiusCard};">
                 <div class="palcard-brand">PALCARD</div>
                 <div class="palcard-body">
                   <div class="profile-info">
@@ -566,7 +590,7 @@
                     </div>
                   </div>
                   <div class="right-avatar-container">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper" style="background: ${t.avatarBg};">
                       <div class="avatar-inner"><img src="${pal.avatar || ''}"></div>
                     </div>
                   </div>
@@ -588,6 +612,7 @@
       }
 
       const detailArea = document.getElementById('detail-content-area');
+      const t = pal.theme;
       
       let gridHtml = '';
       gridLabelsStatic.forEach((lbl, i) => {
@@ -613,7 +638,7 @@
         <div class="palcard-container" onclick="this.classList.toggle('flipped')">
           <div class="palcard-flipper">
             <!-- 表面 -->
-            <div class="palcard">
+            <div class="palcard" style="background: ${t.cardBg}; border-color: ${t.cardBorder}; border-radius: ${t.radiusCard};">
               <div class="palcard-brand">PALCARD</div>
               <div class="palcard-body">
                 <div class="profile-info">
@@ -627,7 +652,7 @@
                   </div>
                 </div>
                 <div class="right-avatar-container">
-                  <div class="avatar-wrapper">
+                  <div class="avatar-wrapper" style="background: ${t.avatarBg};">
                     <div class="avatar-inner"><img src="${pal.avatar || ''}"></div>
                   </div>
                 </div>
@@ -635,7 +660,7 @@
             </div>
 
             <!-- 裏面 -->
-            <div class="palcard palcard-back">
+            <div class="palcard palcard-back" style="background: ${t.cardBg}; border-color: ${t.cardBorder}; border-radius: ${t.radiusCard};">
               <div class="palcard-brand">PALCARD</div>
               <div class="back-content">
                 <div>
