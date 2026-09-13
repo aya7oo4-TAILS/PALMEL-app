@@ -674,22 +674,29 @@
       try {
         const config = JSON.parse(saved);
 
-        // 1. 名刺（PALCARD）のテーマや枠の反映
+        // 1. 名刺（PALCARD）表面・裏面のテーマや枠の反映
         const palcards = document.querySelectorAll('.palcard');
         palcards.forEach(card => {
-          card.className = card.className.replace(/(theme-\S+|cardedge-\S+)/g, '').trim() + ` ${config.theme || 'theme-dark'} ${config.cardEdge || 'cardedge-none'}`;
+          card.classList.remove('theme-dark', 'theme-gold', 'theme-midnight', 'theme-rose');
+          card.classList.remove('cardedge-none', 'cardedge-gold', 'cardedge-neon', 'cardedge-ruby');
+          
+          if (config.theme) card.classList.add(config.theme);
+          if (config.cardEdge) card.classList.add(config.cardEdge);
         });
 
         // 2. アバター枠の反映
         const avatarWrappers = document.querySelectorAll('.avatar-wrapper');
         avatarWrappers.forEach(wrapper => {
-          wrapper.className = wrapper.className.replace(/frame-\S+/g, '').trim() + ` ${config.frame || 'frame-none'}`;
+          wrapper.classList.remove('frame-none', 'frame-gold', 'frame-neon', 'frame-ruby');
+          if (config.frame) wrapper.classList.add(config.frame);
         });
 
         // 3. 称号の反映
         const titleElements = document.querySelectorAll('#in-user-title');
         titleElements.forEach(el => {
-          el.textContent = config.title || 'FIRST PAL';
+          if (config.title) {
+            el.textContent = config.title;
+          }
           if (config.title === 'GOD') {
             el.classList.add('sparkle-text');
           } else {
@@ -770,7 +777,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadGridDataFromStorage();
       adjustPetNameFontSize();
-      applySavedCustomization(); // 着せ替え適用
+      applySavedCustomization(); // 着せ替え適用を確実に実行
 
       const freeInput = document.getElementById('custom-free-label');
       if (freeInput) {
