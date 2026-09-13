@@ -351,8 +351,23 @@
 
     /* 9マス Grid */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
-    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
+    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); transition: all 0.3s ease; }
     .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
+    
+    /* 9マス フレームスタイル バリエーション */
+    .grid-container.gridframe-standard .grid-item {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .grid-container.gridframe-gold .grid-item {
+      border: 1.5px solid var(--gold);
+    }
+    .grid-container.gridframe-neon .grid-item {
+      border: 1.5px solid #00f2fe;
+    }
+    .grid-container.gridframe-dark .grid-item {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #0d0f11;
+    }
     
     .grid-label-input {
       background: transparent; border: none; border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
@@ -564,7 +579,7 @@
         </div>
       </div>
 
-      <div class="grid-container" id="main-grid-container">
+      <div class="grid-container gridframe-standard" id="main-grid-container">
         <script>
           const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
           gridLabels.forEach((lbl, i) => {
@@ -703,6 +718,17 @@
             el.classList.remove('sparkle-text');
           }
         });
+
+        // 4. 9マスのフレームスタイル反映
+        const gridContainer = document.getElementById('main-grid-container');
+        if (gridContainer) {
+          gridContainer.classList.remove('gridframe-standard', 'gridframe-gold', 'gridframe-neon', 'gridframe-dark');
+          if (config.gridFrame) {
+            gridContainer.classList.add(config.gridFrame);
+          } else {
+            gridContainer.classList.add('gridframe-standard');
+          }
+        }
 
       } catch(e) {
         console.error('着せ替え設定の読み込みに失敗しました', e);
