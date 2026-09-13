@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PARMEL - CUSTOMIZE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0d0e;
+      --card-bg: linear-gradient(135deg, #24292e 0%, #16181b 100%);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      --text-main: #f5f6f8;
+      --text-sub: #9aa0a6;
+      --gold: #e5c07b;
+      --radius-card: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 12px 12px 80px;
+    }
+
+    .app-viewport {
+      width: 100%;
+      max-width: 414px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ヘッダー */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .back-link {
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .header-title {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    /* プレビュー用ミニカード */
+    .preview-container {
+      width: 100%;
+      aspect-ratio: 1.55 / 1;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 12px 14px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .preview-brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-sub); font-weight: 600; text-align: center; }
+    .preview-body { display: flex; justify-content: space-between; align-items: center; flex: 1; }
+    .preview-info { display: flex; flex-direction: column; gap: 4px; }
+    .preview-title { font-size: 0.72rem; color: var(--gold); font-weight: 500; letter-spacing: 0.05em; }
+    .preview-name { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 700; color: #fff; }
+
+    .preview-avatar { width: 90px; height: 90px; border-radius: 50%; padding: 3px; background: rgba(255,255,255,0.2); }
+    .preview-avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #1a1d20; }
+    .preview-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* カスタマイズ項目エリア */
+    .customize-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 4px;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .option-card {
+      background: #15181b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .option-card.selected {
+      border-color: var(--gold);
+      background: rgba(229, 192, 123, 0.08);
+    }
+    .option-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    /* 保存ボタン */
+    .save-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--gold);
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(229, 192, 123, 0.3);
+    }
+    .save-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* 称号用キラキラ */
+    .sparkle-text {
+      background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <div class="header">
+      <a href="index.html" class="back-link">← ホームに戻る</a>
+      <div class="header-title">DESIGN CUSTOMIZE</div>
+      <div style="width: 50px;"></div>
+    </div>
+
+    <!-- リアルタイムプレビューカード -->
+    <div class="preview-container" id="preview-card">
+      <div class="preview-brand">PALCARD PREVIEW</div>
+      <div class="preview-body">
+        <div class="preview-info">
+          <div class="preview-title" id="prev-title">FIRST PAL</div>
+          <div class="preview-name">MEL</div>
+        </div>
+        <div class="preview-avatar" id="prev-avatar-wrap">
+          <div class="preview-avatar-inner">
+            <img src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg" alt="avatar">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- カスタマイズ選択セクション -->
+    <div class="customize-section">
+      
+      <!-- テーマ選択 -->
+      <div class="section-title">CARD THEME</div>
+      <div class="option-grid">
+        <div class="option-card selected" onclick="selectOption('theme', 'theme-dark', this)">
+          <div class="option-name">ダーククラシック</div>
+        </div>
+        <div class="option-card" onclick="selectOption('theme', 'theme-light', this)">
+          <div class="option-name">ラグジュアリーゴールド</div>
+        </div>
+      </div>
+
+      <!-- カード枠選択 -->
+      <div class="option-grid">
+        <div class="option-card selected" onclick="selectOption('cardFrame', 'cardframe-none', this)">
+          <div class="option-name">標準枠</div>
+        </div>
+        <div class="option-card" onclick="selectOption('cardFrame', 'cardframe-neon', this)">
+          <div class="option-name">ネオンフレーム</div>
+        </div>
+      </div>
+
+      <!-- 称号選択 -->
+      <div class="section-title">USER TITLE</div>
+      <div class="option-grid">
+        <div class="option-card selected" onclick="selectOption('title', 'FIRST PAL', this)">
+          <div class="option-name">FIRST PAL</div>
+        </div>
+        <div class="option-card" onclick="selectOption('title', 'ELITE PAL', this)">
+          <div class="option-name">ELITE PAL</div>
+        </div>
+        <div class="option-card" onclick="selectOption('title', 'GOD', this)">
+          <div class="option-name sparkle-text">✨ GOD ✨</div>
+        </div>
+        <div class="option-card" onclick="selectOption('title', 'OVERLORD', this)">
+          <div class="option-name sparkle-text">👑 OVERLORD 👑</div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="save-btn" onclick="saveCustomization()">設定を保存してホームへ</button>
+
+  </div>
+
+  <script>
+    // 現在選択されている設定の状態管理
+    let currentConfig = {
+      theme: 'theme-dark',
+      cardFrame: 'cardframe-none',
+      frame: 'frame-none',
+      title: 'FIRST PAL',
+      gridFrame: 'gframe-none'
+    };
+
+    // ページ読み込み時に保存済み設定があれば復元
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('parmel_custom_config');
+      if (saved) {
+        try {
+          currentConfig = JSON.parse(saved);
+          updatePreview();
+          // 該当するカードの選択状態をUIに反映
+          document.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('selected');
+            const onclickAttr = card.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(currentConfig.theme) || 
+                onclickAttr && onclickAttr.includes(currentConfig.cardFrame) || 
+                onclickAttr && onclickAttr.includes(currentConfig.title)) {
+              card.classList.add('selected');
+            }
+          });
+        } catch(e) {
+          console.error('設定の読み込みに失敗しました', e);
+        }
+      }
+    });
+
+    function selectOption(category, value, element) {
+      currentConfig[category] = value;
+
+      // 同じグループ内のカードの選択状態を切り替え
+      const parentGrid = element.closest('.option-grid');
+      if (parentGrid) {
+        parentGrid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      }
+      element.classList.add('selected');
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const previewCard = document.getElementById('preview-card');
+      const prevTitle = document.getElementById('prev-title');
+
+      // プレビューカードに反映
+      previewCard.className = `preview-container ${currentConfig.theme} ${currentConfig.cardFrame}`;
+      
+      prevTitle.textContent = currentConfig.title;
+      if (currentConfig.title === 'GOD' || currentConfig.title === 'OVERLORD') {
+        prevTitle.classList.add('sparkle-text');
+      } else {
+        prevTitle.classList.remove('sparkle-text');
+      }
+    }
+
+    function saveCustomization() {
+      localStorage.setItem('parmel_custom_config', JSON.stringify(currentConfig));
+      alert('着せ替え設定を保存しました！');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
