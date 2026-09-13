@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PARMEL - CUSTOMIZE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-main: #0b0d0e;
       --card-bg: linear-gradient(135deg, #24292e 0%, #16181b 100%);
       --card-border: rgba(255, 255, 255, 0.08);
       --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      --avatar-bg: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05));
       --text-main: #f5f6f8;
       --text-sub: #9aa0a6;
       --gold: #e5c07b;
@@ -25,123 +26,252 @@
       background: var(--bg-main);
       color: var(--text-main);
       font-family: 'Noto Sans JP', sans-serif;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden; /* 全体のスクロールを固定し、内部のスクロールエリアで制御 */
     }
 
-    body {
-      display: flex;
-      justify-content: center;
-      padding: 12px 12px 80px;
-    }
-
+    /* 画面全体を固定レイアウトにするコンテナ */
     .app-viewport {
+      position: relative;
       width: 100%;
       max-width: 414px;
+      height: 100%;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      padding: 12px 12px 0;
+      gap: 12px;
     }
 
-    /* ヘッダー */
-    .header {
+    .header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 0;
+      flex-shrink: 0;
     }
     .back-link {
       color: var(--text-sub);
       text-decoration: none;
       font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      font-weight: 500;
     }
-    .header-title {
+    .page-title {
       font-family: 'Cinzel', serif;
-      color: var(--gold);
       font-size: 0.95rem;
-      letter-spacing: 0.1em;
-      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      font-weight: bold;
     }
 
-    /* プレビュー用ミニカード */
-    .preview-container {
+    /* 【固定エリア】常に画面上部に表示されるプレビュー用PALCARD */
+    .preview-fixed-area {
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .palcard-container {
+      position: relative;
       width: 100%;
       aspect-ratio: 1.55 / 1;
+    }
+
+    .palcard {
+      position: absolute;
+      inset: 0;
       background: var(--card-bg);
+      background-size: cover;
+      background-position: center;
       border-radius: var(--radius-card);
-      padding: 12px 14px;
+      padding: 12px 14px 44px;
       box-shadow: var(--card-shadow);
       border: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      position: relative;
+      justify-content: flex-start;
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .preview-brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-sub); font-weight: 600; text-align: center; }
-    .preview-body { display: flex; justify-content: space-between; align-items: center; flex: 1; }
-    .preview-info { display: flex; flex-direction: column; gap: 4px; }
-    .preview-title { font-size: 0.72rem; color: var(--gold); font-weight: 500; letter-spacing: 0.05em; }
-    .preview-name { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 700; color: #fff; }
+    .palcard-brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-sub); font-weight: 600; text-align: center; margin-bottom: 2px; }
+    .palcard-body { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex: 1; }
+    
+    .profile-info { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      min-width: 0; 
+      justify-content: flex-start; 
+      margin-top: 10px;
+      position: relative;
+    }
+    
+    .user-title-display {
+      font-size: 0.72rem;
+      color: var(--gold);
+      font-weight: 500;
+      margin-top: 4px; 
+      margin-bottom: 3px;
+      letter-spacing: 0.05em;
+      min-height: 0.9rem;
+    }
 
-    .preview-avatar { width: 90px; height: 90px; border-radius: 50%; padding: 3px; background: rgba(255,255,255,0.2); }
-    .preview-avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #1a1d20; }
-    .preview-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+    .pet-name { 
+      font-family: 'Cinzel', 'Noto Sans JP', sans-serif; 
+      font-size: 2.15rem; 
+      line-height: 1.3; 
+      padding-top: 4px;  
+      margin-top: 0;   
+      margin-bottom: 4px;  
+      font-weight: 700; 
+      color: #fff; 
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    
+    .profile-fields { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 1px; 
+      margin-top: auto; 
+    }
+    
+    .field-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding-bottom: 2px;
+      margin-bottom: 2px;
+      padding-right: 8px;
+    }
+    .field-row::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 95%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-    /* カスタマイズ項目エリア */
-    .customize-section {
+    .field-label { font-size: 0.52rem; color: var(--text-sub); width: 60px; flex-shrink: 0; }
+    .field-value { color: var(--text-main); font-size: 0.6rem; font-weight: 500; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .right-avatar-container { 
+      position: relative; 
+      width: 168px; 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: flex-start; 
+      justify-content: center; 
+      margin-top: 18px; 
+    }
+    .avatar-wrapper { width: 164px; height: 164px; border-radius: 50%; padding: 3px; background: var(--avatar-bg); display: block; transition: all 0.3s ease; }
+    .avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #1a1d20; }
+    .avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+    .palcard-footer { position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+    .footer-left-group { display: flex; gap: 10px; }
+    
+    .icon-btn {
+      height: 26px; 
+      min-width: 52px; 
+      padding: 0 8px; 
+      background: rgba(255, 255, 255, 0.12); 
+      border: 1px solid rgba(255, 255, 255, 0.22); 
+      border-radius: 8px; 
+      color: var(--text-main); 
+      font-size: 0.52rem; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 500; 
+      text-decoration: none;
+    }
+
+    /* PALCARDテーマ バリエーション */
+    .palcard.theme-dark { background: linear-gradient(135deg, #24292e 0%, #16181b 100%); }
+    .palcard.theme-gold { background: linear-gradient(135deg, #3d3422 0%, #1a1710 100%); }
+    .palcard.theme-midnight { background: linear-gradient(135deg, #162235 0%, #0a0e14 100%); }
+    .palcard.theme-rose { background: linear-gradient(135deg, #331d25 0%, #140a0e 100%); }
+
+    /* PALCARD縁（Card Edge）のスタイル（デフォルト・カスタム） */
+    .palcard.cardedge-none { border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--card-shadow); }
+    .palcard.cardedge-gold { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(229, 192, 123, 0.35), var(--card-shadow); }
+    .palcard.cardedge-neon { border: 2px solid #00f2fe; box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), var(--card-shadow); }
+    .palcard.cardedge-ruby { border: 2px solid #ff758c; box-shadow: 0 0 20px rgba(255, 117, 140, 0.45), var(--card-shadow); }
+
+    /* アバターフレーム バリエーション */
+    .avatar-wrapper.frame-none { background: var(--avatar-bg); padding: 3px; box-shadow: none; }
+    .avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); padding: 4px; box-shadow: 0 0 12px rgba(229,192,123,0.5); }
+    .avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); padding: 4px; box-shadow: 0 0 12px rgba(0,242,254,0.5); }
+    .avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); padding: 4px; box-shadow: 0 0 12px rgba(255,117,140,0.5); }
+
+    /* 称号スタイル（キラキラ） */
+    .sparkle-text {
+      background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
+    }
+
+    /* 【スクロールエリア】ここだけがスワイプ（スクロール）する */
+    .scrollable-controls {
+      flex: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      margin-top: 8px;
+      gap: 12px;
+      padding-bottom: 40px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scrollable-controls::-webkit-scrollbar {
+      display: none; /* スクロールバー非表示 */
     }
 
+    /* コントロールパネルUI */
+    .customize-section {
+      background: #14171a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
     .section-title {
       font-family: 'Cinzel', serif;
       font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      color: var(--gold);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 4px;
+      letter-spacing: 0.1em;
+      color: var(--text-sub);
     }
-
     .option-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
     }
-
-    .option-card {
-      background: #15181b;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      text-align: center;
-      transition: all 0.2s ease;
-    }
-    .option-card.selected {
-      border-color: var(--gold);
-      background: rgba(229, 192, 123, 0.08);
-    }
-    .option-name {
-      font-size: 0.75rem;
-      font-weight: 500;
+    .option-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 4px;
       color: var(--text-main);
+      font-size: 0.65rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option-btn.active {
+      background: rgba(229, 192, 123, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+      font-weight: bold;
     }
 
-    /* 保存ボタン */
-    .save-btn {
+    .save-config-btn {
       width: 100%;
       padding: 14px;
       background: var(--gold);
@@ -149,22 +279,11 @@
       border-radius: 12px;
       color: #000;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
       text-align: center;
-      margin-top: 10px;
-      box-shadow: 0 4px 15px rgba(229, 192, 123, 0.3);
-    }
-    .save-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* 称号用キラキラ */
-    .sparkle-text {
-      background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
+      margin-top: 4px;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -172,133 +291,134 @@
 
   <div class="app-viewport">
     
-    <div class="header">
-      <a href="index.html" class="back-link">← ホームに戻る</a>
-      <div class="header-title">DESIGN CUSTOMIZE</div>
+    <div class="header-row">
+      <a href="index.html" class="back-link">← ホームへ戻る</a>
+      <h1 class="page-title">CUSTOMIZE</h1>
       <div style="width: 50px;"></div>
     </div>
 
-    <!-- リアルタイムプレビューカード -->
-    <div class="preview-container" id="preview-card">
-      <div class="preview-brand">PALCARD PREVIEW</div>
-      <div class="preview-body">
-        <div class="preview-info">
-          <div class="preview-title" id="prev-title">FIRST PAL</div>
-          <div class="preview-name">MEL</div>
-        </div>
-        <div class="preview-avatar" id="prev-avatar-wrap">
-          <div class="preview-avatar-inner">
-            <img src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg" alt="avatar">
+    <!-- 【固定エリア】スクロールしても絶対に画面から切れないプレビュー用PALCARD -->
+    <div class="preview-fixed-area">
+      <div class="palcard-container">
+        <div class="palcard theme-dark cardedge-none" id="preview-palcard">
+          <div class="palcard-brand">PALCARD</div>
+          <div class="palcard-body">
+            <div class="profile-info">
+              <div id="preview-title" class="user-title-display">FIRST PAL</div>
+              <div class="pet-name">MEL</div>
+              <div class="profile-fields">
+                <div class="field-row"><span class="field-label">生年月日</span><div class="field-value">2026.02.10</div></div>
+                <div class="field-row"><span class="field-label">nickname</span><div class="field-value">メルちゃん</div></div>
+                <div class="field-row"><span class="field-label">message</span><div class="field-value">こんにちは</div></div>
+                <div class="field-row"><span class="field-label">pallike</span><div class="field-value" style="color:var(--gold); font-weight:bold;">♡ 0</div></div>
+              </div>
+            </div>
+            
+            <div class="right-avatar-container">
+              <div class="avatar-wrapper frame-none" id="preview-avatar">
+                <div class="avatar-inner"><img src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="palcard-footer">
+            <div class="footer-left-group">
+              <button class="icon-btn"><span>PALINK</span></button>
+              <button class="icon-btn"><span>GET</span></button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- カスタマイズ選択セクション -->
-    <div class="customize-section">
+    <!-- 【スクロールエリア】ここの中身だけがスワイプして動く -->
+    <div class="scrollable-controls">
       
-      <!-- テーマ選択 -->
-      <div class="section-title">CARD THEME</div>
-      <div class="option-grid">
-        <div class="option-card selected" onclick="selectOption('theme', 'theme-dark', this)">
-          <div class="option-name">ダーククラシック</div>
-        </div>
-        <div class="option-card" onclick="selectOption('theme', 'theme-light', this)">
-          <div class="option-name">ラグジュアリーゴールド</div>
-        </div>
-      </div>
-
-      <!-- カード枠選択 -->
-      <div class="option-grid">
-        <div class="option-card selected" onclick="selectOption('cardFrame', 'cardframe-none', this)">
-          <div class="option-name">標準枠</div>
-        </div>
-        <div class="option-card" onclick="selectOption('cardFrame', 'cardframe-neon', this)">
-          <div class="option-name">ネオンフレーム</div>
+      <!-- 着せ替えコントロール：1. PALCARDテーマ -->
+      <div class="customize-section">
+        <div class="section-title">PALCARD テーマ</div>
+        <div class="option-grid" id="theme-options">
+          <button class="option-btn active" data-type="theme" data-value="theme-dark">標準</button>
+          <button class="option-btn" data-type="theme" data-value="theme-gold">ゴールド</button>
+          <button class="option-btn" data-type="theme" data-value="theme-midnight">ミッドナイト</button>
+          <button class="option-btn" data-type="theme" data-value="theme-rose">ローズ</button>
         </div>
       </div>
 
-      <!-- 称号選択 -->
-      <div class="section-title">USER TITLE</div>
-      <div class="option-grid">
-        <div class="option-card selected" onclick="selectOption('title', 'FIRST PAL', this)">
-          <div class="option-name">FIRST PAL</div>
-        </div>
-        <div class="option-card" onclick="selectOption('title', 'ELITE PAL', this)">
-          <div class="option-name">ELITE PAL</div>
-        </div>
-        <div class="option-card" onclick="selectOption('title', 'GOD', this)">
-          <div class="option-name sparkle-text">✨ GOD ✨</div>
-        </div>
-        <div class="option-card" onclick="selectOption('title', 'OVERLORD', this)">
-          <div class="option-name sparkle-text">👑 OVERLORD 👑</div>
+      <!-- 着せ替えコントロール：2. カード縁（Card Edge） -->
+      <div class="customize-section">
+        <div class="section-title">カード縁（エッジ）</div>
+        <div class="option-grid" id="cardedge-options">
+          <button class="option-btn active" data-type="cardEdge" data-value="cardedge-none">標準</button>
+          <button class="option-btn" data-type="cardEdge" data-value="cardedge-gold">ゴールド</button>
+          <button class="option-btn" data-type="cardEdge" data-value="cardedge-neon">ネオン</button>
+          <button class="option-btn" data-type="cardEdge" data-value="cardedge-ruby">ルビー</button>
         </div>
       </div>
+
+      <!-- 着せ替えコントロール：3. アバターフレーム -->
+      <div class="customize-section">
+        <div class="section-title">アバターフレーム</div>
+        <div class="option-grid" id="frame-options">
+          <button class="option-btn active" data-type="frame" data-value="frame-none">なし</button>
+          <button class="option-btn" data-type="frame" data-value="frame-gold">黄金縁</button>
+          <button class="option-btn" data-type="frame" data-value="frame-neon">ネオン</button>
+          <button class="option-btn" data-type="frame" data-value="frame-ruby">ルビー</button>
+        </div>
+      </div>
+
+      <!-- 着せ替えコントロール：4. 称号 -->
+      <div class="customize-section">
+        <div class="section-title">称号設定</div>
+        <div class="option-grid" style="grid-template-columns: repeat(2, 1fr);" id="title-options">
+          <button class="option-btn active" data-type="title" data-value="FIRST PAL">FIRST PAL</button>
+          <button class="option-btn sparkle-text" data-type="title" data-value="GOD">🌟 GOD 🌟</button>
+        </div>
+      </div>
+
+      <button class="save-config-btn" onclick="saveCustomization()">着せ替えを保存する</button>
 
     </div>
-
-    <button class="save-btn" onclick="saveCustomization()">設定を保存してホームへ</button>
 
   </div>
 
   <script>
-    // 現在選択されている設定の状態管理
-    let currentConfig = {
+    const currentConfig = {
       theme: 'theme-dark',
-      cardFrame: 'cardframe-none',
+      cardEdge: 'cardedge-none',
       frame: 'frame-none',
-      title: 'FIRST PAL',
-      gridFrame: 'gframe-none'
+      title: 'FIRST PAL'
     };
 
-    // ページ読み込み時に保存済み設定があれば復元
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem('parmel_custom_config');
-      if (saved) {
-        try {
-          currentConfig = JSON.parse(saved);
-          updatePreview();
-          // 該当するカードの選択状態をUIに反映
-          document.querySelectorAll('.option-card').forEach(card => {
-            card.classList.remove('selected');
-            const onclickAttr = card.getAttribute('onclick');
-            if (onclickAttr && onclickAttr.includes(currentConfig.theme) || 
-                onclickAttr && onclickAttr.includes(currentConfig.cardFrame) || 
-                onclickAttr && onclickAttr.includes(currentConfig.title)) {
-              card.classList.add('selected');
-            }
-          });
-        } catch(e) {
-          console.error('設定の読み込みに失敗しました', e);
-        }
-      }
+    document.querySelectorAll('.option-grid').forEach(grid => {
+      grid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.option-btn');
+        if (!btn) return;
+
+        const type = btn.dataset.type;
+        const value = btn.dataset.value;
+
+        grid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        currentConfig[type] = value;
+        updatePreview();
+      });
     });
 
-    function selectOption(category, value, element) {
-      currentConfig[category] = value;
-
-      // 同じグループ内のカードの選択状態を切り替え
-      const parentGrid = element.closest('.option-grid');
-      if (parentGrid) {
-        parentGrid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-      }
-      element.classList.add('selected');
-
-      updatePreview();
-    }
-
     function updatePreview() {
-      const previewCard = document.getElementById('preview-card');
-      const prevTitle = document.getElementById('prev-title');
+      const card = document.getElementById('preview-palcard');
+      const avatar = document.getElementById('preview-avatar');
+      const titleEl = document.getElementById('preview-title');
 
-      // プレビューカードに反映
-      previewCard.className = `preview-container ${currentConfig.theme} ${currentConfig.cardFrame}`;
-      
-      prevTitle.textContent = currentConfig.title;
-      if (currentConfig.title === 'GOD' || currentConfig.title === 'OVERLORD') {
-        prevTitle.classList.add('sparkle-text');
+      card.className = `palcard ${currentConfig.theme} ${currentConfig.cardEdge}`;
+      avatar.className = `avatar-wrapper ${currentConfig.frame}`;
+      titleEl.textContent = currentConfig.title;
+
+      if (currentConfig.title === 'GOD') {
+        titleEl.classList.add('sparkle-text');
       } else {
-        prevTitle.classList.remove('sparkle-text');
+        titleEl.classList.remove('sparkle-text');
       }
     }
 
@@ -307,6 +427,26 @@
       alert('着せ替え設定を保存しました！');
       window.location.href = 'index.html';
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('parmel_custom_config');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          Object.assign(currentConfig, parsed);
+
+          document.querySelectorAll('.option-btn').forEach(btn => {
+            const type = btn.dataset.type;
+            const val = btn.dataset.value;
+            if (currentConfig[type] === val) {
+              btn.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+            }
+          });
+          updatePreview();
+        } catch(e) {}
+      }
+    });
   </script>
 </body>
 </html>
