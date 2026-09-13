@@ -478,7 +478,7 @@
       </div>
     </div>
 
-    <!-- [2] 9マスカスタム タブコンテンツ (プレビューもスクロール領域へ配置) -->
+    <!-- [2] 9マスカスタム タブコンテンツ -->
     <div id="tab-content-grid" class="custom-tab-content">
       <div class="scrollable-controls">
         <div class="grid-preview-wrapper">
@@ -574,7 +574,9 @@
 
       // 2. 9マスプレビュー更新
       const gridPreviewContainer = document.getElementById('preview-grid-container');
-      gridPreviewContainer.className = `grid-container-preview ${currentConfig.gridFrame || 'gridframe-standard'}`;
+      if (gridPreviewContainer) {
+        gridPreviewContainer.className = `grid-container-preview ${currentConfig.gridFrame || 'gridframe-standard'}`;
+      }
     }
 
     function saveCustomization() {
