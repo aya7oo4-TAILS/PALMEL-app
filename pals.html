@@ -1,1 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PARMEL - PALS (SNS)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0d0e;
+      --card-bg: #16181b;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f5f6f8;
+      --text-sub: #9aa0a6;
+      --gold: #e5c07b;
+      --radius-card: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      width: 100%; height: 100%; background: var(--bg-main); color: var(--text-main);
+      font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; overflow-y: auto;
+    }
+
+    body { display: flex; justify-content: center; padding: 12px 12px 80px; }
+
+    .app-viewport {
+      width: 100%; max-width: 414px; display: flex; flex-direction: column; gap: 14px;
+    }
+
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 4px 0;
+    }
+    .page-title { font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.15em; color: var(--gold); font-weight: bold; }
+
+    /* 投稿作成ボタン・エリア */
+    .post-trigger-btn {
+      width: 100%; background: rgba(255, 255, 255, 0.06); border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 12px; padding: 12px; color: var(--text-sub); font-size: 0.75rem; text-align: center; cursor: pointer;
+    }
+
+    /* タイムライン・フィードカード */
+    .feed-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feed-header { display: flex; align-items: center; gap: 10px; }
+    
+    /* アバターフレーム連動 */
+    .feed-avatar-wrapper { width: 40px; height: 40px; border-radius: 50%; padding: 2px; flex-shrink: 0; display: block; }
+    .feed-avatar-wrapper.frame-none { background: rgba(255,255,255,0.1); }
+    .feed-avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); box-shadow: 0 0 8px rgba(229,192,123,0.4); }
+    .feed-avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); box-shadow: 0 0 8px rgba(0,242,254,0.4); }
+    .feed-avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); box-shadow: 0 0 8px rgba(255,117,140,0.4); }
+
+    .feed-avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #222; }
+    .feed-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+    .feed-user-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .feed-username { font-size: 0.8rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .feed-time { font-size: 0.55rem; color: var(--text-sub); }
+
+    .feed-message { font-size: 0.75rem; color: var(--text-main); line-height: 1.4; word-break: break-all; }
+
+    /* SNS上のカスタム9マスミニ表示（着せ替えフレーム連動） */
+    .feed-mini-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      background: #0f1113; border-radius: 10px; padding: 6px;
+    }
+    .feed-mini-grid.gridframe-standard { border: 1px solid rgba(255, 255, 255, 0.08); }
+    .feed-mini-grid.gridframe-gold { border: 1.5px solid var(--gold); box-shadow: 0 0 8px rgba(229,192,123,0.2); }
+    .feed-mini-grid.gridframe-neon { border: 1.5px solid #00f2fe; box-shadow: 0 0 8px rgba(0,242,254,0.2); }
+    .feed-mini-grid.gridframe-dark { border: 1px solid rgba(255, 255, 255, 0.15); background: #0d0f11; }
+
+    .feed-mini-item {
+      background: #15181b; border-radius: 4px; aspect-ratio: 1/1; overflow: hidden; position: relative;
+    }
+    .feed-mini-item img { width: 100%; height: 100%; object-fit: cover; }
+    .feed-mini-empty { width: 100%; height: 100%; background: rgba(255,255,255,0.02); }
+
+    .feed-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; }
+    .like-btn { background: none; border: none; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .like-btn.liked { color: #ff758c; }
+
+    /* 投稿モーダル */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95); backdrop-filter: blur(12px); z-index: 8500; justify-content: center; align-items: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; padding: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .form-label { font-size: 0.7rem; color: var(--text-sub); }
+    .form-textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; resize: none; height: 80px; }
+
+    /* ボトムナビゲーション（確実に固定表示） */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; height: 60px;
+      background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex; justify-content: space-around; align-items: center; z-index: 99999;
+    }
+    .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.62rem; cursor: pointer; width: 25%; text-decoration: none; }
+    .nav-btn.active { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <div class="header-row">
+      <div style="width: 30px;"></div>
+      <h1 class="page-title">PALS FEED</h1>
+      <div style="width: 30px;"></div>
+    </div>
+
+    <!-- 新規投稿トリガー -->
+    <button class="post-trigger-btn" onclick="openPostModal()">＋ 今日の9マスをみんなにシェアする</button>
+
+    <!-- タイムライン一覧 -->
+    <div id="timeline-container" style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- 自分の投稿カード（ローカルストレージ・着せ替え・ホーム編集と完全同期） -->
+      <div class="feed-card">
+        <div class="feed-header">
+          <div class="feed-avatar-wrapper frame-none" id="sns-avatar-wrapper">
+            <div class="feed-avatar-inner"><img id="sns-my-avatar" src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg" alt=""></div>
+          </div>
+          <div class="feed-user-info">
+            <span class="feed-username" id="sns-my-name">MEL</span>
+            <span class="feed-time">たった今</span>
+          </div>
+        </div>
+        <div class="feed-message" id="sns-my-msg">みんなのパルに我が家の9マスをシェアしました！✨</div>
+        
+        <!-- 自動連動するカスタム9マス・ミニグリッド -->
+        <div class="feed-mini-grid gridframe-standard" id="sns-my-grid"></div>
+
+        <div class="feed-footer">
+          <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">12</span></button>
+          <span style="font-size: 0.55rem; color: var(--text-sub);">PALCARD ID: #84920</span>
+        </div>
+      </div>
+
+      <!-- ダミーのタイムラインカード（他のユーザー） -->
+      <div class="feed-card">
+        <div class="feed-header">
+          <div class="feed-avatar-wrapper frame-gold">
+            <div class="feed-avatar-inner"><img src="https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg" alt=""></div>
+          </div>
+          <div class="feed-user-info">
+            <span class="feed-username">モカちゃん</span>
+            <span class="feed-time">2時間前</span>
+          </div>
+        </div>
+        <div class="feed-message">今日は新しいおもちゃではしゃぎすぎました🐶🐾</div>
+        <div class="feed-mini-grid gridframe-gold">
+          <div class="feed-mini-item"><img src="https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg"></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
+        </div>
+        <div class="feed-footer">
+          <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">24</span></button>
+          <span style="font-size: 0.55rem; color: var(--text-sub);">PALCARD ID: #39210</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 投稿モーダル -->
+  <div id="post-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold); margin-bottom:12px;">NEW POST</h3>
+      <div class="form-group">
+        <label class="form-label">メッセージ</label>
+        <textarea id="post-message-input" class="form-textarea" placeholder="今日の様子や一言を入力..."></textarea>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button style="flex:1; padding:10px; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:#fff; cursor:pointer;" onclick="closePostModal()">キャンセル</button>
+        <button style="flex:1; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="submitPost()">投稿する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ボトムナビゲーション -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-btn">MYPAL</a>
+    <a href="ALBUM.html" class="nav-btn">ALBUM</a>
+    <a href="PALRUM.html" class="nav-btn">PALRUM</a>
+    <a href="PALS.html" class="nav-btn active">PALS</a>
+  </nav>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. プロフィール情報（名前・アバター・メッセージ）の同期
+      const profileSaved = localStorage.getItem('parmel_profile_data');
+      if (profileSaved) {
+        try {
+          const profile = JSON.parse(profileSaved);
+          if (profile.name) document.getElementById('sns-my-name').innerText = profile.name;
+          if (profile.ownerMessage) document.getElementById('sns-my-msg').innerText = profile.ownerMessage;
+          if (profile.avatar) document.getElementById('sns-my-avatar').src = profile.avatar;
+        } catch(e) {}
+      }
+
+      // 2. 着せ替え設定（アバターフレーム・9マスフレーム）の同期
+      const customSaved = localStorage.getItem('parmel_custom_config');
+      if (customSaved) {
+        try {
+          const config = JSON.parse(customSaved);
+          const avatarWrapper = document.getElementById('sns-avatar-wrapper');
+          if (avatarWrapper) avatarWrapper.className = `feed-avatar-wrapper ${config.frame || 'frame-none'}`;
+
+          const miniGrid = document.getElementById('sns-my-grid');
+          if (miniGrid) miniGrid.className = `feed-mini-grid ${config.gridFrame || 'gridframe-standard'}`;
+        } catch(e) {}
+      }
+
+      // 3. ホーム画面の9マスデータの同期
+      const gridSaved = localStorage.getItem('parmel_grid_data');
+      const gridContainer = document.getElementById('sns-my-grid');
+      if (gridContainer) {
+        // 既存のミニグリッドの中身を一度クリア（クラスは維持）
+        const currentClass = gridContainer.className;
+        gridContainer.innerHTML = '';
+        gridContainer.className = currentClass;
+
+        let images = [];
+        if (gridSaved) {
+          try {
+            const gridData = JSON.parse(gridSaved);
+            images = gridData.images || [];
+          } catch(e) {}
+        }
+
+        for (let i = 0; i < 9; i++) {
+          const item = document.createElement('div');
+          item.className = 'feed-mini-item';
+          if (images[i]) {
+            const img = document.createElement('img');
+            img.src = images[i];
+            item.appendChild(img);
+          } else {
+            const empty = document.createElement('div');
+            empty.className = 'feed-mini-empty';
+            item.appendChild(empty);
+          }
+          gridContainer.appendChild(item);
+        }
+      }
+    });
+
+    function openPostModal() {
+      document.getElementById('post-modal').classList.add('active');
+    }
+
+    function closePostModal() {
+      document.getElementById('post-modal').classList.remove('active');
+    }
+
+    function submitPost() {
+      const msg = document.getElementById('post-message-input').value.trim();
+      if (msg) {
+        document.getElementById('sns-my-msg').innerText = msg;
+      }
+      closePostModal();
+      alert('タイムラインに投稿しました！');
+    }
+
+    function toggleLike(btn) {
+      btn.classList.toggle('liked');
+      const countSpan = btn.querySelector('.like-count');
+      let count = parseInt(countSpan.innerText);
+      if (btn.classList.contains('liked')) {
+        btn.innerHTML = '♥ <span class="like-count">' + (count + 1) + '</span>';
+        btn.style.color = '#ff758c';
+      } else {
+        btn.innerHTML = '♡ <span class="like-count">' + (count - 1) + '</span>';
+        btn.style.color = 'var(--text-sub)';
+      }
+    }
+  </script>
+</body>
+</html>
 
