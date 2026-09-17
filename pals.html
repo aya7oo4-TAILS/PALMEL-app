@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PARMEL - PALS (SNS)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-main: #0b0d0e;
@@ -36,8 +36,8 @@
 
     /* 投稿作成ボタン・エリア */
     .post-trigger-btn {
-      width: 100%; background: rgba(255, 255, 255, 0.06); border: 1px dashed rgba(255, 255, 255, 0.2);
-      border-radius: 12px; padding: 12px; color: var(--text-sub); font-size: 0.75rem; text-align: center; cursor: pointer;
+      width: 100%; background: rgba(229, 192, 123, 0.1); border: 1px dashed var(--gold);
+      border-radius: 12px; padding: 12px; color: var(--gold); font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold;
     }
 
     /* タイムライン・フィードカード */
@@ -51,7 +51,8 @@
       gap: 12px;
     }
 
-    .feed-header { display: flex; align-items: center; gap: 10px; }
+    .feed-header { display: flex; align-items: center; justify-content: space-between; }
+    .feed-header-left { display: flex; align-items: center; gap: 10px; }
     
     /* アバターフレーム連動 */
     .feed-avatar-wrapper { width: 40px; height: 40px; border-radius: 50%; padding: 2px; flex-shrink: 0; display: block; }
@@ -63,41 +64,64 @@
     .feed-avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #222; }
     .feed-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
 
-    .feed-user-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .feed-user-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .feed-username { font-size: 0.8rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .feed-time { font-size: 0.55rem; color: var(--text-sub); }
 
     .feed-message { font-size: 0.75rem; color: var(--text-main); line-height: 1.4; word-break: break-all; }
 
-    /* SNS上のカスタム9マスミニ表示（着せ替えフレーム連動） */
-    .feed-mini-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-      background: #0f1113; border-radius: 10px; padding: 6px;
-    }
-    .feed-mini-grid.gridframe-standard { border: 1px solid rgba(255, 255, 255, 0.08); }
-    .feed-mini-grid.gridframe-gold { border: 1.5px solid var(--gold); box-shadow: 0 0 8px rgba(229,192,123,0.2); }
-    .feed-mini-grid.gridframe-neon { border: 1.5px solid #00f2fe; box-shadow: 0 0 8px rgba(0,242,254,0.2); }
-    .feed-mini-grid.gridframe-dark { border: 1px solid rgba(255, 255, 255, 0.15); background: #0d0f11; }
+    /* 単写真投稿用スタイル */
+    .feed-single-image { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden; background: #111; }
+    .feed-single-image img { width: 100%; height: 100%; object-fit: cover; }
 
-    .feed-mini-item {
-      background: #15181b; border-radius: 4px; aspect-ratio: 1/1; overflow: hidden; position: relative;
-    }
-    .feed-mini-item img { width: 100%; height: 100%; object-fit: cover; }
-    .feed-mini-empty { width: 100%; height: 100%; background: rgba(255,255,255,0.02); }
+    /* ホーム画面と完全同一デザインの9マス Grid（SNS用ミニプレビュー） */
+    .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+    
+    .grid-container.gridframe-standard { border: none; }
+    .grid-container.gridframe-gold { border: 1.5px solid var(--gold); border-radius: 12px; padding: 4px; box-shadow: 0 0 10px rgba(229,192,123,0.2); }
+    .grid-container.gridframe-neon { border: 1.5px solid #00f2fe; border-radius: 12px; padding: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.2); }
+    .grid-container.gridframe-dark { border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 4px; background: #0d0f11; }
 
-    .feed-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; }
+    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
+    .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.52rem; letter-spacing: 0.08em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .grid-image-box { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .grid-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .grid-item.palmel-item .grid-image-box { position: relative; }
+    .grid-item.palmel-item .grid-image-box img.has-image { filter: brightness(0.45); }
+
+    .palmel-overlay-logo {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 5; pointer-events: none; font-family: 'Cinzel', serif; letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.95); text-shadow: 0 0 10px rgba(229, 192, 123, 0.6), 0 0 20px rgba(229, 192, 123, 0.3);
+      font-size: 0.7rem; font-weight: 700; text-align: center; padding: 0 2px;
+    }
+
     .like-btn { background: none; border: none; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .like-btn.liked { color: #ff758c; }
+
+    /* 無限スクロールのローディング表示 */
+    .loading-indicator { text-align: center; padding: 16px; color: var(--text-sub); font-size: 0.7rem; display: none; }
 
     /* 投稿モーダル */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95); backdrop-filter: blur(12px); z-index: 8500; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; padding: 20px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; max-height: 90vh; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 0.7rem; color: var(--text-sub); }
-    .form-textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; resize: none; height: 80px; }
+    .form-textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; resize: none; height: 60px; }
+    
+    .type-select-row { display: flex; gap: 8px; }
+    .type-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; text-align: center; }
+    .type-btn.active { background: rgba(229,192,123,0.15); border-color: var(--gold); color: var(--gold); font-weight: bold; }
 
-    /* ボトムナビゲーション（確実に固定表示） */
+    /* 1枚写真のプレビュー選択エリア（正方形） */
+    .photo-select-preview { width: 100%; aspect-ratio: 1 / 1; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; overflow: hidden; position: relative; }
+    .photo-select-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ボトムナビゲーション */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 414px; height: 60px;
@@ -119,76 +143,54 @@
       <div style="width: 30px;"></div>
     </div>
 
-    <!-- 新規投稿トリガー -->
-    <button class="post-trigger-btn" onclick="openPostModal()">＋ 今日の9マスをみんなにシェアする</button>
+    <!-- 投稿作成ボタン -->
+    <button class="post-trigger-btn" onclick="openPostModal()">＋ 投稿する</button>
 
     <!-- タイムライン一覧 -->
     <div id="timeline-container" style="display: flex; flex-direction: column; gap: 14px;">
-      
-      <!-- 自分の投稿カード（ローカルストレージ・着せ替え・ホーム編集と完全同期） -->
-      <div class="feed-card">
-        <div class="feed-header">
-          <div class="feed-avatar-wrapper frame-none" id="sns-avatar-wrapper">
-            <div class="feed-avatar-inner"><img id="sns-my-avatar" src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg" alt=""></div>
-          </div>
-          <div class="feed-user-info">
-            <span class="feed-username" id="sns-my-name">MEL</span>
-            <span class="feed-time">たった今</span>
-          </div>
-        </div>
-        <div class="feed-message" id="sns-my-msg">みんなのパルに我が家の9マスをシェアしました！✨</div>
-        
-        <!-- 自動連動するカスタム9マス・ミニグリッド -->
-        <div class="feed-mini-grid gridframe-standard" id="sns-my-grid"></div>
-
-        <div class="feed-footer">
-          <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">12</span></button>
-          <span style="font-size: 0.55rem; color: var(--text-sub);">PALCARD ID: #84920</span>
-        </div>
-      </div>
-
-      <!-- ダミーのタイムラインカード（他のユーザー） -->
-      <div class="feed-card">
-        <div class="feed-header">
-          <div class="feed-avatar-wrapper frame-gold">
-            <div class="feed-avatar-inner"><img src="https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg" alt=""></div>
-          </div>
-          <div class="feed-user-info">
-            <span class="feed-username">モカちゃん</span>
-            <span class="feed-time">2時間前</span>
-          </div>
-        </div>
-        <div class="feed-message">今日は新しいおもちゃではしゃぎすぎました🐶🐾</div>
-        <div class="feed-mini-grid gridframe-gold">
-          <div class="feed-mini-item"><img src="https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg"></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-          <div class="feed-mini-item"><div class="feed-mini-empty"></div></div>
-        </div>
-        <div class="feed-footer">
-          <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">24</span></button>
-          <span style="font-size: 0.55rem; color: var(--text-sub);">PALCARD ID: #39210</span>
-        </div>
-      </div>
-
+      <!-- JavaScriptで動的にダミー投稿が追加されます -->
     </div>
+
+    <!-- 無限スクロール読み込み中表示 -->
+    <div id="loading-indicator" class="loading-indicator">読み込み中...</div>
 
   </div>
 
   <!-- 投稿モーダル -->
   <div id="post-modal" class="modal-overlay">
     <div class="modal-content">
-      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold); margin-bottom:12px;">NEW POST</h3>
+      <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold); margin-bottom:4px;">NEW POST</h3>
+      
       <div class="form-group">
+        <label class="form-label">投稿タイプ</label>
+        <div class="type-select-row">
+          <button type="button" class="type-btn active" id="type-photo-btn" onclick="switchPostType('photo')">1枚の写真を投稿</button>
+          <button type="button" class="type-btn" id="type-grid-btn" onclick="switchPostType('grid')">9マスを投稿</button>
+        </div>
+      </div>
+
+      <!-- 1枚写真選択エリア（正方形） -->
+      <div class="form-group" id="photo-select-container">
+        <label class="form-label">写真を選択</label>
+        <div class="photo-select-preview" id="photo-preview-box" onclick="document.getElementById('hidden-photo-input').click()">
+          <span id="photo-placeholder-text">＋ タップして写真を選択</span>
+          <img id="selected-single-img" style="display: none;">
+        </div>
+        <input type="file" id="hidden-photo-input" accept="image/*" style="display: none;" onchange="onPhotoSelected(event)">
+      </div>
+
+      <!-- 9マスプレビューエリア -->
+      <div class="form-group" id="grid-preview-container" style="display: none;">
+        <div id="modal-grid-preview" class="grid-container gridframe-standard"></div>
+      </div>
+
+      <!-- メッセージ入力欄（写真投稿時のみ表示） -->
+      <div class="form-group" id="message-container">
         <label class="form-label">メッセージ</label>
         <textarea id="post-message-input" class="form-textarea" placeholder="今日の様子や一言を入力..."></textarea>
       </div>
-      <div style="display:flex; gap:8px; margin-top:14px;">
+
+      <div style="display:flex; gap:8px; margin-top:6px;">
         <button style="flex:1; padding:10px; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:#fff; cursor:pointer;" onclick="closePostModal()">キャンセル</button>
         <button style="flex:1; padding:10px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;" onclick="submitPost()">投稿する</button>
       </div>
@@ -198,70 +200,271 @@
   <!-- ボトムナビゲーション -->
   <nav class="bottom-nav">
     <a href="index.html" class="nav-btn">MYPAL</a>
-    <a href="ALBUM.html" class="nav-btn">ALBUM</a>
-    <a href="PALRUM.html" class="nav-btn">PALRUM</a>
-    <a href="PALS.html" class="nav-btn active">PALS</a>
+    <a href="album.html" class="nav-btn">ALBUM</a>
+    <a href="palrium.html" class="nav-btn">PALRIUM</a>
+    <a href="pals.html" class="nav-btn active">PALS</a>
   </nav>
 
   <script>
+    let currentPostType = 'photo';
+    let selectedPhotoUrl = '';
+    let isLoading = false;
+
+    // 元となるダミーデータプール
+    const baseTemplates = [
+      {
+        name: "モカちゃん",
+        avatar: "https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg",
+        frame: "frame-gold",
+        time: "2時間前",
+        likes: 24,
+        type: "single",
+        message: "今日は新しいおもちゃではしゃぎすぎました🐶🐾",
+        image: "https://images.dog.ceo/breeds/poodle-standard/n02113799_2280.jpg"
+      },
+      {
+        name: "レオン",
+        avatar: "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg",
+        frame: "frame-neon",
+        time: "5時間前",
+        likes: 58,
+        type: "grid",
+        gridFrame: "gridframe-neon",
+        images: [
+          "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg", "",
+          "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg", "",
+          "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg", "", "", "",
+          "https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"
+        ]
+      },
+      {
+        name: "ココア",
+        avatar: "https://images.dog.ceo/breeds/pomeranian/n02112137_1450.jpg",
+        frame: "frame-ruby",
+        time: "1日前",
+        likes: 112,
+        type: "single",
+        message: "日向ぼっこ中〜気持ちよさそうにお昼寝しています☀️",
+        image: "https://images.dog.ceo/breeds/pomeranian/n02112137_1450.jpg"
+      },
+      {
+        name: "ソラ",
+        avatar: "https://images.dog.ceo/breeds/husky/n02110185_1269.jpg",
+        frame: "frame-gold",
+        time: "2日前",
+        likes: 89,
+        type: "single",
+        message: "お散歩コースでシロツメクサを発見！春ですねぇ🌸",
+        image: "https://images.dog.ceo/breeds/husky/n02110185_1269.jpg"
+      },
+      {
+        name: "ルル",
+        avatar: "https://images.dog.ceo/breeds/shiba/n02109961_1645.jpg",
+        frame: "frame-none",
+        time: "3日前",
+        likes: 45,
+        type: "grid",
+        gridFrame: "gridframe-gold",
+        images: [
+          "", "https://images.dog.ceo/breeds/shiba/n02109961_1645.jpg", "",
+          "https://images.dog.ceo/breeds/shiba/n02109961_1645.jpg", "", "",
+          "https://images.dog.ceo/breeds/shiba/n02109961_1645.jpg", "", ""
+        ]
+      },
+      {
+        name: "クッキー",
+        avatar: "https://images.dog.ceo/breeds/Beagle/n02088364_11336.jpg",
+        frame: "frame-neon",
+        time: "4日前",
+        likes: 76,
+        type: "single",
+        message: "「おやつまだですか？」の顔。この後たっぷりあげました🦴✨",
+        image: "https://images.dog.ceo/breeds/Beagle/n02088364_11336.jpg"
+      },
+      {
+        name: "マロン",
+        avatar: "https://images.dog.ceo/breeds/corgi-cardigan/n02113186_3798.jpg",
+        frame: "frame-ruby",
+        time: "5日前",
+        likes: 140,
+        type: "single",
+        message: "おすわり上手にできたのでご褒美待ち中🐶💖",
+        image: "https://images.dog.ceo/breeds/corgi-cardigan/n02113186_3798.jpg"
+      }
+    ];
+
+    // 初期読み込み＆スクロールイベントの設定
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. プロフィール情報（名前・アバター・メッセージ）の同期
-      const profileSaved = localStorage.getItem('parmel_profile_data');
-      if (profileSaved) {
+      loadMorePosts();
+      
+      window.addEventListener('scroll', () => {
+        // ページの一番下に近づいたら追加読み込み
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+          loadMorePosts();
+        }
+      });
+    });
+
+    function loadMorePosts() {
+      if (isLoading) return;
+      isLoading = true;
+      document.getElementById('loading-indicator').style.display = 'block';
+
+      setTimeout(() => {
+        const timeline = document.getElementById('timeline-container');
+
+        // テンプレートからランダムに数件生成して無限に追加
+        for (let i = 0; i < 4; i++) {
+          const template = baseTemplates[Math.floor(Math.random() * baseTemplates.length)];
+          const card = document.createElement('div');
+          card.className = 'feed-card';
+
+          let contentHtml = '';
+          let messageHtml = '';
+
+          if (template.type === 'grid') {
+            const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+            let gridItemsHtml = '';
+            gridLabels.forEach((lbl, idx) => {
+              const isPalmel = (idx === 8);
+              const extraClass = isPalmel ? ' palmel-item' : '';
+              const imgSrc = template.images[idx] ? template.images[idx] : '';
+              const hasImageClass = (isPalmel && imgSrc) ? ' has-image' : '';
+              const palmelOverlay = isPalmel ? `<div class="palmel-overlay-logo">PALMEL</div>` : '';
+
+              gridItemsHtml += `
+                <div class="grid-item${extraClass}">
+                  <div class="grid-label">${lbl}</div>
+                  <div class="grid-image-box">
+                    <img src="${imgSrc}" class="${hasImageClass}" style="${imgSrc ? 'display:block;' : 'display:none;'}">
+                    ${palmelOverlay}
+                  </div>
+                </div>
+              `;
+            });
+            contentHtml = `<div class="grid-container ${template.gridFrame || 'gridframe-standard'}">${gridItemsHtml}</div>`;
+          } else {
+            if (template.message) {
+              messageHtml = `<div class="feed-message">${template.message}</div>`;
+            }
+            if (template.image) {
+              contentHtml = `<div class="feed-single-image"><img src="${template.image}"></div>`;
+            }
+          }
+
+          // ランダムないいね数変動
+          const randomLikes = template.likes + Math.floor(Math.random() * 10);
+
+          card.innerHTML = `
+            <div class="feed-header">
+              <div class="feed-header-left">
+                <div class="feed-avatar-wrapper ${template.frame}">
+                  <div class="feed-avatar-inner"><img src="${template.avatar}" alt=""></div>
+                </div>
+                <div class="feed-user-info">
+                  <span class="feed-username">${template.name}</span>
+                  <span class="feed-time">${template.time}</span>
+                </div>
+              </div>
+              <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">${randomLikes}</span></button>
+            </div>
+            ${messageHtml}
+            ${contentHtml}
+          `;
+
+          timeline.appendChild(card);
+        }
+
+        document.getElementById('loading-indicator').style.display = 'none';
+        isLoading = false;
+      }, 500); // 0.5秒のロード演出
+    }
+
+    function switchPostType(type) {
+      currentPostType = type;
+      const gridBtn = document.getElementById('type-grid-btn');
+      const photoBtn = document.getElementById('type-photo-btn');
+      const photoContainer = document.getElementById('photo-select-container');
+      const gridContainer = document.getElementById('grid-preview-container');
+      const messageContainer = document.getElementById('message-container');
+
+      if (type === 'photo') {
+        photoBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        photoContainer.style.display = 'flex';
+        gridContainer.style.display = 'none';
+        messageContainer.style.display = 'flex';
+      } else {
+        gridBtn.classList.add('active');
+        photoBtn.classList.remove('active');
+        photoContainer.style.display = 'none';
+        gridContainer.style.display = 'flex';
+        messageContainer.style.display = 'none';
+        renderModalGridPreview();
+      }
+    }
+
+    function renderModalGridPreview() {
+      const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+      const gridSaved = localStorage.getItem('parmel_grid_data');
+      let images = [];
+      let freeTitle = 'FREE';
+      if (gridSaved) {
         try {
-          const profile = JSON.parse(profileSaved);
-          if (profile.name) document.getElementById('sns-my-name').innerText = profile.name;
-          if (profile.ownerMessage) document.getElementById('sns-my-msg').innerText = profile.ownerMessage;
-          if (profile.avatar) document.getElementById('sns-my-avatar').src = profile.avatar;
+          const gridData = JSON.parse(gridSaved);
+          images = gridData.images || [];
+          if (gridData.freeLabel) freeTitle = gridData.freeLabel;
         } catch(e) {}
       }
 
-      // 2. 着せ替え設定（アバターフレーム・9マスフレーム）の同期
+      let gridFrame = 'gridframe-standard';
       const customSaved = localStorage.getItem('parmel_custom_config');
       if (customSaved) {
         try {
-          const config = JSON.parse(customSaved);
-          const avatarWrapper = document.getElementById('sns-avatar-wrapper');
-          if (avatarWrapper) avatarWrapper.className = `feed-avatar-wrapper ${config.frame || 'frame-none'}`;
-
-          const miniGrid = document.getElementById('sns-my-grid');
-          if (miniGrid) miniGrid.className = `feed-mini-grid ${config.gridFrame || 'gridframe-standard'}`;
+          const c = JSON.parse(customSaved);
+          if (c.gridFrame) gridFrame = c.gridFrame;
         } catch(e) {}
       }
 
-      // 3. ホーム画面の9マスデータの同期
-      const gridSaved = localStorage.getItem('parmel_grid_data');
-      const gridContainer = document.getElementById('sns-my-grid');
-      if (gridContainer) {
-        // 既存のミニグリッドの中身を一度クリア（クラスは維持）
-        const currentClass = gridContainer.className;
-        gridContainer.innerHTML = '';
-        gridContainer.className = currentClass;
+      const modalGridEl = document.getElementById('modal-grid-preview');
+      modalGridEl.className = `grid-container ${gridFrame}`;
+      modalGridEl.innerHTML = '';
 
-        let images = [];
-        if (gridSaved) {
-          try {
-            const gridData = JSON.parse(gridSaved);
-            images = gridData.images || [];
-          } catch(e) {}
-        }
+      gridLabels.forEach((lbl, i) => {
+        const displayLabel = (i === 2) ? freeTitle : lbl;
+        const isPalmel = (i === 8);
+        const extraClass = isPalmel ? ' palmel-item' : '';
+        const imgSrc = images[i] ? images[i] : '';
+        const hasImageClass = (isPalmel && imgSrc) ? ' has-image' : '';
+        const palmelOverlay = isPalmel ? `<div class="palmel-overlay-logo">PALMEL</div>` : '';
 
-        for (let i = 0; i < 9; i++) {
-          const item = document.createElement('div');
-          item.className = 'feed-mini-item';
-          if (images[i]) {
-            const img = document.createElement('img');
-            img.src = images[i];
-            item.appendChild(img);
-          } else {
-            const empty = document.createElement('div');
-            empty.className = 'feed-mini-empty';
-            item.appendChild(empty);
-          }
-          gridContainer.appendChild(item);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `grid-item${extraClass}`;
+        itemDiv.innerHTML = `
+          <div class="grid-label">${displayLabel}</div>
+          <div class="grid-image-box">
+            <img src="${imgSrc}" class="${hasImageClass}" style="${imgSrc ? 'display:block;' : 'display:none;'}">
+            ${palmelOverlay}
+          </div>
+        `;
+        modalGridEl.appendChild(itemDiv);
+      });
+    }
+
+    function onPhotoSelected(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          selectedPhotoUrl = e.target.result;
+          const imgEl = document.getElementById('selected-single-img');
+          imgEl.src = selectedPhotoUrl;
+          imgEl.style.display = 'block';
+          document.getElementById('photo-placeholder-text').style.display = 'none';
         }
+        reader.readAsDataURL(file);
       }
-    });
+    }
 
     function openPostModal() {
       document.getElementById('post-modal').classList.add('active');
@@ -273,10 +476,110 @@
 
     function submitPost() {
       const msg = document.getElementById('post-message-input').value.trim();
-      if (msg) {
-        document.getElementById('sns-my-msg').innerText = msg;
+      if (currentPostType === 'photo' && !msg && !selectedPhotoUrl) {
+        alert('メッセージまたは写真を入力してください。');
+        return;
       }
+
+      let profileName = 'MEL';
+      let avatarUrl = 'https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg';
+      let avatarFrame = 'frame-none';
+      let gridFrame = 'gridframe-standard';
+
+      const profileSaved = localStorage.getItem('parmel_profile_data');
+      if (profileSaved) {
+        try {
+          const p = JSON.parse(profileSaved);
+          if (p.name) profileName = p.name;
+          if (p.avatar) avatarUrl = p.avatar;
+        } catch(e) {}
+      }
+
+      const customSaved = localStorage.getItem('parmel_custom_config');
+      if (customSaved) {
+        try {
+          const c = JSON.parse(customSaved);
+          if (c.frame) avatarFrame = c.frame;
+          if (c.gridFrame) gridFrame = c.gridFrame;
+        } catch(e) {}
+      }
+
+      const card = document.createElement('div');
+      card.className = 'feed-card';
+
+      let contentHtml = '';
+      let messageHtml = '';
+
+      if (currentPostType === 'grid') {
+        const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
+        const gridSaved = localStorage.getItem('parmel_grid_data');
+        let images = [];
+        let freeTitle = 'FREE';
+        if (gridSaved) {
+          try {
+            const gridData = JSON.parse(gridSaved);
+            images = gridData.images || [];
+            if (gridData.freeLabel) freeTitle = gridData.freeLabel;
+          } catch(e) {}
+        }
+
+        let gridItemsHtml = '';
+        gridLabels.forEach((lbl, i) => {
+          const displayLabel = (i === 2) ? freeTitle : lbl;
+          const isPalmel = (i === 8);
+          const extraClass = isPalmel ? ' palmel-item' : '';
+          const imgSrc = images[i] ? images[i] : '';
+          const hasImageClass = (isPalmel && imgSrc) ? ' has-image' : '';
+          const palmelOverlay = isPalmel ? `<div class="palmel-overlay-logo">PALMEL</div>` : '';
+
+          gridItemsHtml += `
+            <div class="grid-item${extraClass}">
+              <div class="grid-label">${displayLabel}</div>
+              <div class="grid-image-box">
+                <img src="${imgSrc}" class="${hasImageClass}" style="${imgSrc ? 'display:block;' : 'display:none;'}">
+                ${palmelOverlay}
+              </div>
+            </div>
+          `;
+        });
+
+        contentHtml = `<div class="grid-container ${gridFrame}">${gridItemsHtml}</div>`;
+      } else {
+        if (msg) {
+          messageHtml = `<div class="feed-message">${msg}</div>`;
+        }
+        if (selectedPhotoUrl) {
+          contentHtml = `<div class="feed-single-image"><img src="${selectedPhotoUrl}"></div>`;
+        }
+      }
+
+      card.innerHTML = `
+        <div class="feed-header">
+          <div class="feed-header-left">
+            <div class="feed-avatar-wrapper ${avatarFrame}">
+              <div class="feed-avatar-inner"><img src="${avatarUrl}" alt=""></div>
+            </div>
+            <div class="feed-user-info">
+              <span class="feed-username">${profileName}</span>
+              <span class="feed-time">たった今</span>
+            </div>
+          </div>
+          <button class="like-btn" onclick="toggleLike(this)">♡ <span class="like-count">0</span></button>
+        </div>
+        ${messageHtml}
+        ${contentHtml}
+      `;
+
+      const timeline = document.getElementById('timeline-container');
+      timeline.insertBefore(card, timeline.firstChild);
+
       closePostModal();
+      document.getElementById('post-message-input').value = '';
+      selectedPhotoUrl = '';
+      document.getElementById('selected-single-img').style.display = 'none';
+      document.getElementById('photo-placeholder-text').style.display = 'block';
+      switchPostType('photo');
+
       alert('タイムラインに投稿しました！');
     }
 
@@ -295,4 +598,3 @@
   </script>
 </body>
 </html>
-
