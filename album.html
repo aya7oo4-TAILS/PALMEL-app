@@ -25,13 +25,15 @@
       font-family: 'Noto Sans JP', sans-serif;
       overflow-x: hidden;
       overflow-y: auto;
+      /* スマホでのバウンススクロールをスムーズに */
+      -webkit-overflow-scrolling: touch;
     }
 
     body {
       display: flex;
       justify-content: center;
-      /* ボトムナビ（60px）＋重なり防止の余裕を持たせたパディング */
-      padding: 12px 12px 100px;
+      /* ボトムナビ（60px）に隠れないよう、下部に十分な余白を確保 */
+      padding: 12px 12px 160px 12px;
     }
 
     .app-viewport {
@@ -198,8 +200,6 @@
       gap: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       padding-top: 20px;
-      /* ここにもボトムナビにかぶらないよう余白を確保 */
-      padding-bottom: 20px;
     }
 
     .history-title {
@@ -266,7 +266,7 @@
     }
     .history-phone-save-btn:hover { color: var(--text-main); }
 
-    /* 保存された履歴内のミニ9マスグリッド (プレビューと同じ 1 / 1.25 に完全統一) */
+    /* 保存された履歴内のミニ9マスグリッド (プレビューと同じサイズ) */
     .history-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -332,6 +332,12 @@
       filter: brightness(0.45);
     }
 
+    /* ボトムナビの下に絶対に隠れないようにするためのスクロール余白スペーサー */
+    .scroll-spacer {
+      width: 100%;
+      height: 100px;
+    }
+
     /* ボトムナビゲーション */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -374,6 +380,9 @@
         <!-- 保存された履歴がここに入ります -->
       </div>
     </div>
+
+    <!-- ボトムナビの下までしっかりスクロールするための余白スペーサー -->
+    <div class="scroll-spacer"></div>
   </div>
 
   <!-- ボトムナビゲーション -->
