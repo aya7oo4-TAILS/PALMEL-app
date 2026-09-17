@@ -424,13 +424,11 @@
     }
     .drawer-overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* サイドメニューの修正箇所 */
     .side-drawer {
       position: fixed; top: 0; left: 0; width: 280px; height: 100%;
       background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 26000; transform: translateX(-100%);
       display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px;
-      padding-bottom: max(20px, env(safe-area-inset-bottom)); /* iPhoneのホームインジケータ配慮 */
       box-shadow: 10px 0 30px rgba(0,0,0,0.8);
       will-change: transform;
     }
@@ -441,29 +439,13 @@
     .drawer-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.9rem; font-weight: bold; letter-spacing: 0.1em; }
     .drawer-close-btn { background: none; border: none; color: var(--text-sub); font-size: 1.2rem; cursor: pointer; }
 
-    .drawer-content-area {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      justify-content: space-between;
-      overflow-y: auto;
-      margin-top: 16px;
-    }
-
-    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; }
+    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-main); font-size: 0.8rem;
       cursor: pointer; text-align: left; transition: background 0.2s ease; text-decoration: none; width: 100%;
     }
     .drawer-item:active { background: rgba(229,192,123,0.15); border-color: var(--gold); }
-
-    /* ログアウトボタンを押しやすい位置に調整 */
-    .drawer-logout-container {
-      margin-top: 20px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -487,20 +469,13 @@
         <span class="drawer-title">SETTINGS</span>
         <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
       </div>
-    </div>
-    
-    <!-- メニュー内を上部と下部に分けてレイアウト -->
-    <div class="drawer-content-area">
       <div class="drawer-menu-list">
         <button class="drawer-item" onclick="toggleModal('palcard-edit-modal', true); closeDrawer();">PALCARD編集</button>
         <button class="drawer-item" onclick="toggleModal('account-modal', true); closeDrawer();">アカウント・プロフ設定</button>
         <a href="customize.html" class="drawer-item">デザイン着せ替え</a>
       </div>
-      
-      <div class="drawer-logout-container">
-        <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
-      </div>
     </div>
+    <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
   </aside>
 
   <div class="app-viewport">
