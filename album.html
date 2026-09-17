@@ -30,7 +30,8 @@
     body {
       display: flex;
       justify-content: center;
-      padding: 12px 12px 80px;
+      /* 下部のナビゲーション（60px）と余白を考慮してパディングを調整 */
+      padding: 12px 12px 90px;
     }
 
     .app-viewport {
@@ -472,7 +473,6 @@
 
       btn.innerText = '保存中...';
 
-      // 現在適用されているフレーム設定を取得して記録する
       let currentFrame = 'gridframe-standard';
       try {
         const customSaved = localStorage.getItem('parmel_custom_config');
@@ -495,7 +495,7 @@
         id: Date.now() + Math.random().toString(36).substr(2, 4),
         date: dateStr,
         freeLabel: currentAlbumData.freeLabel,
-        gridFrame: currentFrame, // 保存時のカスタムフレームを保存
+        gridFrame: currentFrame,
         images: compressedImages
       };
 
@@ -579,7 +579,6 @@
           `;
         });
 
-        // 保存されていた当時のフレームクラスを適用（データがない古いものは標準にする）
         const frameClass = item.gridFrame || 'gridframe-standard';
 
         card.innerHTML = `
