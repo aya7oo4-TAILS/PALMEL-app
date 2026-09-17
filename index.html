@@ -95,7 +95,7 @@
       flex-direction: column;
       justify-content: flex-start;
       overflow: hidden;
-      transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+      transition: background 0.3s ease;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       pointer-events: auto;
@@ -105,24 +105,6 @@
       transform: rotateY(180deg);
       justify-content: space-between;
     }
-
-    /* PALCARDテーマ バリエーション */
-    .palcard.theme-dark { background: linear-gradient(135deg, #24292e 0%, #16181b 100%); }
-    .palcard.theme-gold { background: linear-gradient(135deg, #3d3422 0%, #1a1710 100%); }
-    .palcard.theme-midnight { background: linear-gradient(135deg, #162235 0%, #0a0e14 100%); }
-    .palcard.theme-rose { background: linear-gradient(135deg, #331d25 0%, #140a0e 100%); }
-
-    /* カード縁（Card Edge）バリエーション */
-    .palcard.cardedge-none { border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--card-shadow); }
-    .palcard.cardedge-gold { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(229, 192, 123, 0.35), var(--card-shadow); }
-    .palcard.cardedge-neon { border: 2px solid #00f2fe; box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), var(--card-shadow); }
-    .palcard.cardedge-ruby { border: 2px solid #ff758c; box-shadow: 0 0 20px rgba(255, 117, 140, 0.45), var(--card-shadow); }
-
-    /* アバターフレーム バリエーション */
-    .avatar-wrapper.frame-none { background: var(--avatar-bg); padding: 3px; box-shadow: none; }
-    .avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); padding: 4px; box-shadow: 0 0 12px rgba(229,192,123,0.5); }
-    .avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); padding: 4px; box-shadow: 0 0 12px rgba(0,242,254,0.5); }
-    .avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); padding: 4px; box-shadow: 0 0 12px rgba(255,117,140,0.5); }
 
     .palcard-brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-sub); font-weight: 600; text-align: center; margin-bottom: 2px; }
     .palcard-body { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex: 1; }
@@ -351,23 +333,8 @@
 
     /* 9マス Grid */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
-    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); transition: all 0.3s ease; }
+    .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
     .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
-    
-    /* 9マス フレームスタイル バリエーション */
-    .grid-container.gridframe-standard .grid-item {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .grid-container.gridframe-gold .grid-item {
-      border: 1.5px solid var(--gold);
-    }
-    .grid-container.gridframe-neon .grid-item {
-      border: 1.5px solid #00f2fe;
-    }
-    .grid-container.gridframe-dark .grid-item {
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: #0d0f11;
-    }
     
     .grid-label-input {
       background: transparent; border: none; border-bottom: 1px dashed rgba(229, 192, 123, 0.5);
@@ -457,11 +424,13 @@
     }
     .drawer-overlay.active { opacity: 1; pointer-events: auto; }
 
+    /* サイドメニューの修正箇所 */
     .side-drawer {
       position: fixed; top: 0; left: 0; width: 280px; height: 100%;
       background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 26000; transform: translateX(-100%);
       display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom)); /* iPhoneのホームインジケータ配慮 */
       box-shadow: 10px 0 30px rgba(0,0,0,0.8);
       will-change: transform;
     }
@@ -472,13 +441,29 @@
     .drawer-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.9rem; font-weight: bold; letter-spacing: 0.1em; }
     .drawer-close-btn { background: none; border: none; color: var(--text-sub); font-size: 1.2rem; cursor: pointer; }
 
-    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .drawer-content-area {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+      overflow-y: auto;
+      margin-top: 16px;
+    }
+
+    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; }
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-main); font-size: 0.8rem;
       cursor: pointer; text-align: left; transition: background 0.2s ease; text-decoration: none; width: 100%;
     }
     .drawer-item:active { background: rgba(229,192,123,0.15); border-color: var(--gold); }
+
+    /* ログアウトボタンを押しやすい位置に調整 */
+    .drawer-logout-container {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -490,14 +475,6 @@
     }
     .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.62rem; cursor: pointer; width: 25%; text-decoration: none; }
     .nav-btn.active { color: var(--gold); }
-
-    /* キラキラ文字エフェクト（称号用） */
-    .sparkle-text {
-      background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
-    }
   </style>
 </head>
 <body class="mypal-mode">
@@ -510,13 +487,20 @@
         <span class="drawer-title">SETTINGS</span>
         <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
       </div>
+    </div>
+    
+    <!-- メニュー内を上部と下部に分けてレイアウト -->
+    <div class="drawer-content-area">
       <div class="drawer-menu-list">
         <button class="drawer-item" onclick="toggleModal('palcard-edit-modal', true); closeDrawer();">PALCARD編集</button>
         <button class="drawer-item" onclick="toggleModal('account-modal', true); closeDrawer();">アカウント・プロフ設定</button>
         <a href="customize.html" class="drawer-item">デザイン着せ替え</a>
       </div>
+      
+      <div class="drawer-logout-container">
+        <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
+      </div>
     </div>
-    <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
   </aside>
 
   <div class="app-viewport">
@@ -526,7 +510,7 @@
       <div class="palcard-container" id="palcard-container" onclick="toggleCardFlip(event)">
         <div class="palcard-flipper">
           
-          <div class="palcard theme-dark cardedge-none" id="main-palcard">
+          <div class="palcard" id="main-palcard">
             <div class="palcard-brand">PALCARD</div>
             <div class="palcard-body">
               <div class="profile-info">
@@ -541,7 +525,7 @@
               </div>
               
               <div class="right-avatar-container">
-                <div class="avatar-wrapper frame-none" id="main-avatar-wrapper">
+                <div class="avatar-wrapper" id="main-avatar-wrapper">
                   <div class="avatar-inner"><img id="avatar-img" src="https://images.dog.ceo/breeds/retriever-golden/n02099601_3004.jpg"></div>
                 </div>
                 <div class="present-pet-name" id="present-pet-name-display" style="display:none;">MEL</div>
@@ -559,7 +543,7 @@
             </div>
           </div>
 
-          <div class="palcard palcard-back theme-dark cardedge-none" id="back-palcard">
+          <div class="palcard palcard-back" id="back-palcard">
             <div class="palcard-brand">PALCARD</div>
             <div class="back-content">
               <div>
@@ -579,7 +563,7 @@
         </div>
       </div>
 
-      <div class="grid-container gridframe-standard" id="main-grid-container">
+      <div class="grid-container">
         <script>
           const gridLabels = ['MONTHLY', 'CHARMPOINT', 'FREE', 'FOOD', 'MAIN', 'SLEEPING', 'TOYS', 'FUNNYSHOT', 'NOSE＋PALMEL'];
           gridLabels.forEach((lbl, i) => {
@@ -681,89 +665,6 @@
   <script>
     const STORAGE_KEY = 'parmel_grid_data';
 
-    // 画像圧縮用ヘルパー関数（最大幅800px、画質0.7）
-    function compressImage(file, maxWidth = 800, quality = 0.7) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // 着せ替え設定を自動適用する関数
-    function applySavedCustomization() {
-      const saved = localStorage.getItem('parmel_custom_config');
-      if (!saved) return;
-
-      try {
-        const config = JSON.parse(saved);
-
-        // 1. 名刺（PALCARD）表面・裏面のテーマや枠の反映
-        const palcards = document.querySelectorAll('.palcard');
-        palcards.forEach(card => {
-          card.classList.remove('theme-dark', 'theme-gold', 'theme-midnight', 'theme-rose');
-          card.classList.remove('cardedge-none', 'cardedge-gold', 'cardedge-neon', 'cardedge-ruby');
-          
-          if (config.theme) card.classList.add(config.theme);
-          if (config.cardEdge) card.classList.add(config.cardEdge);
-        });
-
-        // 2. アバター枠の反映
-        const avatarWrappers = document.querySelectorAll('.avatar-wrapper');
-        avatarWrappers.forEach(wrapper => {
-          wrapper.classList.remove('frame-none', 'frame-gold', 'frame-neon', 'frame-ruby');
-          if (config.frame) wrapper.classList.add(config.frame);
-        });
-
-        // 3. 称号の反映
-        const titleElements = document.querySelectorAll('#in-user-title');
-        titleElements.forEach(el => {
-          if (config.title) {
-            el.textContent = config.title;
-          }
-          if (config.title === 'GOD') {
-            el.classList.add('sparkle-text');
-          } else {
-            el.classList.remove('sparkle-text');
-          }
-        });
-
-        // 4. 9マスのフレームスタイル反映
-        const gridContainer = document.getElementById('main-grid-container');
-        if (gridContainer) {
-          gridContainer.classList.remove('gridframe-standard', 'gridframe-gold', 'gridframe-neon', 'gridframe-dark');
-          if (config.gridFrame) {
-            gridContainer.classList.add(config.gridFrame);
-          } else {
-            gridContainer.classList.add('gridframe-standard');
-          }
-        }
-
-      } catch(e) {
-        console.error('着せ替え設定の読み込みに失敗しました', e);
-      }
-    }
-
     // ペト名の文字数に応じて自動でフォントサイズを調整する関数
     function adjustPetNameFontSize() {
       const nameEl = document.getElementById('in-name');
@@ -832,7 +733,6 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadGridDataFromStorage();
       adjustPetNameFontSize();
-      applySavedCustomization(); // 着せ替え適用を確実に実行
 
       const freeInput = document.getElementById('custom-free-label');
       if (freeInput) {
@@ -958,7 +858,7 @@
       }
     }
 
-    async function savePalcardEdit() {
+    function savePalcardEdit() {
       const nameVal = document.getElementById('edit-name').value;
       const birthVal = document.getElementById('edit-birth').value;
       const nicknameVal = document.getElementById('edit-nickname').value;
@@ -977,11 +877,13 @@
       syncOwnerName(ownernameVal);
 
       if (avatarInput.files && avatarInput.files[0]) {
-        // アイコン画像も圧縮してから適用
-        const compressedDataUrl = await compressImage(avatarInput.files[0], 400, 0.7);
-        document.getElementById('avatar-img').src = compressedDataUrl;
-        const cloneAvatar = document.querySelector('#present-card-container #avatar-img');
-        if(cloneAvatar) cloneAvatar.src = compressedDataUrl;
+        const r = new FileReader();
+        r.onload = e => {
+          document.getElementById('avatar-img').src = e.target.result;
+          const cloneAvatar = document.querySelector('#present-card-container #avatar-img');
+          if(cloneAvatar) cloneAvatar.src = e.target.result;
+        };
+        r.readAsDataURL(avatarInput.files[0]);
       }
 
       toggleModal('palcard-edit-modal', false);
@@ -1014,17 +916,19 @@
       alert('アカウント情報を更新しました！');
     }
 
-    async function previewGrid(input, imgId, isPalmel) {
+    function previewGrid(input, imgId, isPalmel) {
       if (input.files && input.files[0]) {
-        // 画像をスリムに圧縮してからプレビュー＆保存
-        const compressedDataUrl = await compressImage(input.files[0], 800, 0.7);
-        const img = document.getElementById(imgId);
-        img.src = compressedDataUrl;
-        img.style.display = 'block';
-        if (isPalmel) {
-          img.classList.add('has-image');
-        }
-        saveGridDataToStorage();
+        const r = new FileReader();
+        r.onload = e => {
+          const img = document.getElementById(imgId);
+          img.src = e.target.result;
+          img.style.display = 'block';
+          if (isPalmel) {
+            img.classList.add('has-image');
+          }
+          saveGridDataToStorage();
+        };
+        r.readAsDataURL(input.files[0]);
       }
     }
 
