@@ -460,9 +460,10 @@
       position: fixed; top: 0; left: 0; width: 280px; height: 100%;
       background: #14171a; border-right: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 26000; transform: translateX(-100%);
-      display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px;
+      display: flex; flex-direction: column; padding: 20px 16px;
       box-shadow: 10px 0 30px rgba(0,0,0,0.8);
       will-change: transform;
+      overflow-y: auto;
     }
     .side-drawer.animated { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .side-drawer.open { transform: translateX(0); }
@@ -471,7 +472,7 @@
     .drawer-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.9rem; font-weight: bold; letter-spacing: 0.1em; }
     .drawer-close-btn { background: none; border: none; color: var(--text-sub); font-size: 1.2rem; cursor: pointer; }
 
-    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .drawer-menu-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; flex: 1; }
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-main); font-size: 0.8rem;
@@ -496,18 +497,15 @@
   <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
   
   <aside id="side-drawer" class="side-drawer">
-    <div>
-      <div class="drawer-header">
-        <span class="drawer-title">SETTINGS</span>
-        <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
-      </div>
-      <div class="drawer-menu-list">
-        <button class="drawer-item" onclick="toggleModal('palcard-edit-modal', true); closeDrawer();">PALCARD編集</button>
-        <button class="drawer-item" onclick="toggleModal('account-modal', true); closeDrawer();">アカウント・プロフ設定</button>
-        <a href="customize.html" class="drawer-item">デザイン着せ替え</a>
-      </div>
+    <div class="drawer-header">
+      <span class="drawer-title">SETTINGS</span>
+      <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
     </div>
-    <button class="drawer-item" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05);" onclick="alert('ログアウトしました'); closeDrawer();">ログアウト</button>
+    <div class="drawer-menu-list">
+      <button class="drawer-item" onclick="toggleModal('palcard-edit-modal', true); closeDrawer();">PALCARD編集</button>
+      <button class="drawer-item" onclick="toggleModal('account-modal', true); closeDrawer();">アカウント・プロフ設定</button>
+      <a href="customize.html" class="drawer-item">デザイン着せ替え</a>
+    </div>
   </aside>
 
   <div class="app-viewport">
@@ -672,7 +670,6 @@
   <script>
     const STORAGE_KEY = 'parmel_grid_data';
 
-    // ペト名の文字数に応じて自動でフォントサイズを調整する関数
     function adjustPetNameFontSize() {
       const nameEl = document.getElementById('in-name');
       if (!nameEl) return;
@@ -741,25 +738,21 @@
       loadGridDataFromStorage();
       adjustPetNameFontSize();
 
-      // 着せ替え設定を読み込んで反映する処理
       const savedConfig = localStorage.getItem('parmel_custom_config');
       if (savedConfig) {
         try {
           const config = JSON.parse(savedConfig);
           
-          // 1. PALCARDのテーマとエッジを反映
           const card = document.getElementById('main-palcard');
           if (card) {
             card.className = `palcard ${config.theme || 'theme-dark'} ${config.cardEdge || 'cardedge-none'}`;
           }
 
-          // 2. アバターフレームを反映
           const avatar = document.getElementById('main-avatar-wrapper');
           if (avatar) {
             avatar.className = `avatar-wrapper ${config.frame || 'frame-none'}`;
           }
 
-          // 3. 称号を反映
           const titleEl = document.getElementById('in-user-title');
           if (titleEl) {
             titleEl.textContent = config.title || 'FIRST PAL';
@@ -770,7 +763,6 @@
             }
           }
 
-          // 4. 9マスのフレームを反映
           const gridContainer = document.getElementById('main-grid-container');
           if (gridContainer) {
             gridContainer.className = `grid-container ${config.gridFrame || 'gridframe-standard'}`;
