@@ -25,21 +25,49 @@
       font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; overflow-y: auto;
     }
 
-    body { display: flex; justify-content: center; padding: 12px 12px 80px; }
+    /* 固定ヘッダー分（約100px）の余白を上に確保 */
+    body { display: flex; justify-content: center; padding: 100px 12px 80px; }
 
     .app-viewport {
       width: 100%; max-width: 414px; display: flex; flex-direction: column; gap: 14px;
     }
 
+    /* ヘッダーと投稿ボタンをまとめた固定エリア */
+    .fixed-top-area {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 414px;
+      background: var(--bg-main);
+      padding: 10px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 8000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
     .header-row {
-      display: flex; align-items: center; justify-content: space-between; padding: 4px 0;
+      display: flex; align-items: center; justify-content: space-between; padding: 2px 0;
     }
     .page-title { font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.15em; color: var(--gold); font-weight: bold; }
 
-    /* 投稿作成ボタン */
+    /* PALS FEEDの下に配置される投稿ボタン */
     .post-trigger-btn {
-      width: 100%; background: rgba(229, 192, 123, 0.1); border: 1px dashed var(--gold);
-      border-radius: 12px; padding: 12px; color: var(--gold); font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold;
+      width: 100%; 
+      background: rgba(229, 192, 123, 0.12); 
+      border: 1px dashed var(--gold);
+      border-radius: 12px; 
+      padding: 10px; 
+      color: var(--gold); 
+      font-size: 0.75rem; 
+      text-align: center; 
+      cursor: pointer; 
+      font-weight: bold;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     /* タイムライン・フィードカード */
@@ -112,7 +140,7 @@
     .photo-select-preview { width: 100%; aspect-ratio: 1 / 1; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; overflow: hidden; position: relative; }
     .photo-select-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* --- PALCARD ＆ 9マス詳細モーダル（画面全体＋スワイプ対応） --- */
+    /* --- PALCARD ＆ 9マス詳細モーダル --- */
     #palcard-modal {
       align-items: stretch;
       padding: 0;
@@ -157,7 +185,6 @@
     .field-label { font-size: 0.52rem; color: var(--text-sub); width: 60px; flex-shrink: 0; }
     .field-value { color: var(--text-main); font-size: 0.6rem; font-weight: 500; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ホーム画面と完全同じ大サイズのアバター設定 */
     .right-avatar-container { position: relative; width: 168px; flex-shrink: 0; display: flex; align-items: flex-start; justify-content: center; margin-top: 18px; }
     .avatar-wrapper { width: 164px; height: 164px; border-radius: 50%; padding: 3px; background: var(--avatar-bg); display: block; }
     .avatar-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #1a1d20; }
@@ -185,19 +212,19 @@
 </head>
 <body>
 
-  <div class="app-viewport">
-    
+  <!-- PALS FEED（タイトル）とその下の「＋ 投稿する」ボタンをひとまとめにして固定 -->
+  <div class="fixed-top-area">
     <div class="header-row">
       <div style="width: 30px;"></div>
       <h1 class="page-title">PALS FEED</h1>
       <div style="width: 30px;"></div>
     </div>
-
     <button class="post-trigger-btn" onclick="openPostModal()">＋ 投稿する</button>
+  </div>
 
+  <div class="app-viewport">
     <div id="timeline-container" style="display: flex; flex-direction: column; gap: 14px;"></div>
     <div id="loading-indicator" class="loading-indicator">読み込み中...</div>
-
   </div>
 
   <!-- 投稿作成モーダル -->
@@ -238,15 +265,13 @@
     </div>
   </div>
 
-  <!-- PALCARD ＆ 9マス詳細表示用モーダル（スワイプ戻り対応） -->
+  <!-- PALCARD ＆ 9マス詳細表示用モーダル -->
   <div id="palcard-modal" class="modal-overlay">
     <div class="palcard-modal-container" id="palcard-modal-inner" onclick="event.stopPropagation()">
       
-      <!-- ホーム画面完全一致のPALCARD（フリップ可能） -->
       <div class="palcard-container" id="modal-palcard-container" onclick="toggleModalCardFlip()">
         <div class="palcard-flipper">
           
-          <!-- 表面 -->
           <div class="palcard">
             <div class="palcard-brand">PALCARD</div>
             <div class="palcard-body">
@@ -269,7 +294,6 @@
             </div>
           </div>
 
-          <!-- 裏面 -->
           <div class="palcard palcard-back">
             <div class="palcard-brand">PALCARD</div>
             <div class="back-content">
@@ -290,7 +314,6 @@
         </div>
       </div>
 
-      <!-- その下に表示されるホーム画面と全く同じ9マス -->
       <div id="modal-profile-grid" class="grid-container"></div>
 
     </div>
@@ -341,7 +364,6 @@
       initSwipeToClose();
     });
 
-    // スワイプで閉じる機能
     function initSwipeToClose() {
       const modal = document.getElementById('palcard-modal');
       const container = document.getElementById('palcard-modal-inner');
@@ -358,7 +380,6 @@
         if (!isSwiping) return;
         currentX = e.touches[0].clientX;
         const diffX = currentX - startX;
-        // 右にスワイプしている時のみ追従
         if (diffX > 0) {
           modal.style.transform = `translateX(${diffX}px)`;
           modal.style.opacity = `${1 - (diffX / window.innerWidth) * 1.5}`;
@@ -371,7 +392,6 @@
         const diffX = currentX - startX;
         modal.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
         
-        // 80px以上右にスワイプしたら閉じる
         if (diffX > 80) {
           modal.style.transform = `translateX(100%)`;
           modal.style.opacity = '0';
