@@ -272,7 +272,7 @@
       <div class="palcard-container" id="modal-palcard-container" onclick="toggleModalCardFlip()">
         <div class="palcard-flipper">
           
-          <div class="palcard">
+          <div class="palcard" id="modal-palcard-face">
             <div class="palcard-brand">PALCARD</div>
             <div class="palcard-body">
               <div class="profile-info">
@@ -287,14 +287,14 @@
               </div>
               
               <div class="right-avatar-container">
-                <div class="avatar-wrapper">
+                <div class="avatar-wrapper" id="modal-avatar-wrapper">
                   <div class="avatar-inner"><img id="modal-pet-img" src=""></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="palcard palcard-back">
+          <div class="palcard palcard-back" id="modal-palcard-back">
             <div class="palcard-brand">PALCARD</div>
             <div class="back-content">
               <div>
@@ -355,6 +355,7 @@
     ];
 
     window.addEventListener('DOMContentLoaded', () => {
+      applyCustomConfig();
       loadMorePosts();
       window.addEventListener('scroll', () => {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
@@ -363,6 +364,45 @@
       });
       initSwipeToClose();
     });
+
+    // 着せ替え設定（テーマ・フレーム）を適用する関数
+    function applyCustomConfig() {
+      const configSaved = localStorage.getItem('parmel_custom_config');
+      if (!configSaved) return;
+      try {
+        const config = JSON.parse(configSaved);
+
+        // テーマの適用
+        if (config.theme) {
+          const t = config.theme;
+          if (t.bgMain) document.documentElement.style.setProperty('--bg-main', t.bgMain);
+          if (t.textMain) document.documentElement.style.setProperty('--text-main', t.textMain);
+          if (t.textSub) document.documentElement.style.setProperty('--text-sub', t.textSub);
+          if (t.gold) document.documentElement.style.setProperty('--gold', t.gold);
+        }
+
+        // カード・アバターフレームの適用
+        if (config.frame) {
+          const f = config.frame;
+          if (f.cardBg) {
+            document.documentElement.style.setProperty('--card-bg', f.cardBg);
+            const face1 = document.getElementById('modal-palcard-face');
+            const face2 = document.getElementById('modal-palcard-back');
+            if (face1) face1.style.background = f.cardBg;
+            if (face2) face2.style.background = f.cardBg;
+          }
+          if (f.cardBorder) document.documentElement.style.setProperty('--card-border', f.cardBorder);
+          if (f.cardShadow) document.documentElement.style.setProperty('--card-shadow', f.cardShadow);
+          if (f.avatarBg) {
+            document.documentElement.style.setProperty('--avatar-bg', f.avatarBg);
+            const avWrapper = document.getElementById('modal-avatar-wrapper');
+            if (avWrapper) avWrapper.style.background = f.avatarBg;
+          }
+        }
+      } catch(e) {
+        console.error('Failed to load custom config', e);
+      }
+    }
 
     function initSwipeToClose() {
       const modal = document.getElementById('palcard-modal');
