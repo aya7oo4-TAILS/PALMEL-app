@@ -18,68 +18,39 @@
       --radius-card: 18px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
     
     html, body {
       width: 100%; height: 100%; background: var(--bg-main); color: var(--text-main);
       font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; overflow-y: auto;
     }
 
-    /* 固定ヘッダー分（約100px）の余白を上に確保 */
     body { display: flex; justify-content: center; padding: 100px 12px 80px; }
 
     .app-viewport {
       width: 100%; max-width: 414px; display: flex; flex-direction: column; gap: 14px;
     }
 
-    /* ヘッダーと投稿ボタンをまとめた固定エリア */
     .fixed-top-area {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 414px;
-      background: var(--bg-main);
-      padding: 10px 12px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 8000;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; background: var(--bg-main);
+      padding: 10px 12px 10px; display: flex; flex-direction: column; gap: 10px;
+      z-index: 8000; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .header-row {
-      display: flex; align-items: center; justify-content: space-between; padding: 2px 0;
-    }
+    .header-row { display: flex; align-items: center; justify-content: space-between; padding: 2px 0; }
     .page-title { font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.15em; color: var(--gold); font-weight: bold; }
 
-    /* PALS FEEDの下に配置される投稿ボタン */
     .post-trigger-btn {
-      width: 100%; 
-      background: rgba(229, 192, 123, 0.12); 
-      border: 1px dashed var(--gold);
-      border-radius: 12px; 
-      padding: 10px; 
-      color: var(--gold); 
-      font-size: 0.75rem; 
-      text-align: center; 
-      cursor: pointer; 
-      font-weight: bold;
-      backdrop-filter: blur(12px);
+      width: 100%; background: rgba(229, 192, 123, 0.12); border: 1px dashed var(--gold);
+      border-radius: 12px; padding: 10px; color: var(--gold); font-size: 0.75rem; 
+      text-align: center; cursor: pointer; font-weight: bold; backdrop-filter: blur(12px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
-    /* タイムライン・フィードカード */
     .feed-card {
-      background: #16181b;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-card);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      cursor: pointer;
+      background: #16181b; border: 1px solid var(--card-border); border-radius: var(--radius-card);
+      padding: 14px; display: flex; flex-direction: column; gap: 12px; cursor: pointer;
       transition: border-color 0.2s;
     }
     .feed-card:hover { border-color: rgba(229, 192, 123, 0.4); }
@@ -96,12 +67,9 @@
     .feed-time { font-size: 0.55rem; color: var(--text-sub); }
 
     .feed-message { font-size: 0.75rem; color: var(--text-main); line-height: 1.4; word-break: break-all; }
-
-    /* 単写真投稿用スタイル */
     .feed-single-image { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden; background: #111; }
     .feed-single-image img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* ホーム画面完全一致の9マス Grid */
     .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
     .grid-item { background: #15181b; border-radius: 8px; display: flex; flex-direction: column; aspect-ratio: 1 / 1.25; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04); }
     .grid-label { font-family: 'Cinzel', 'Noto Sans JP', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-align: center; padding: 4px 2px; background: rgba(0, 0, 0, 0.4); color: var(--text-sub); display: flex; align-items: center; justify-content: center; z-index: 2; }
@@ -124,14 +92,13 @@
 
     .loading-indicator { text-align: center; padding: 16px; color: var(--text-sub); font-size: 0.7rem; display: none; }
 
-    /* 投稿モーダル */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 6, 7, 0.95); backdrop-filter: blur(12px); z-index: 8500; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #16181b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-card); width: 90%; max-width: 380px; max-height: 90vh; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
     
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 0.7rem; color: var(--text-sub); }
-    .form-textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; resize: none; height: 60px; }
+    .form-textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; resize: none; height: 60px; user-select: text; -webkit-user-select: text; }
     
     .type-select-row { display: flex; gap: 8px; }
     .type-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; text-align: center; }
@@ -140,24 +107,18 @@
     .photo-select-preview { width: 100%; aspect-ratio: 1 / 1; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; overflow: hidden; position: relative; }
     .photo-select-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* --- PALCARD ＆ 9マス詳細モーダル --- */
-    #palcard-modal {
-      align-items: stretch;
-      padding: 0;
-      transition: transform 0.3s ease-out;
-    }
+    #palcard-modal { align-items: stretch; padding: 0; }
     .palcard-modal-container {
       width: 100%; max-width: 414px; height: 100%; max-height: 100vh; 
       overflow-y: auto; display: flex; flex-direction: column; gap: 14px; 
       padding: 24px 16px 80px; background: var(--bg-main); margin: 0 auto;
+      position: relative;
     }
 
-    .palcard-container {
-      perspective: 1000px; width: 100%; aspect-ratio: 1.55 / 1; flex-shrink: 0; cursor: pointer;
-    }
-    .palcard-flipper {
-      position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d;
-    }
+    .modal-close-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: -4px; }
+
+    .palcard-container { perspective: 1000px; width: 100%; aspect-ratio: 1.55 / 1; flex-shrink: 0; cursor: pointer; }
+    .palcard-flipper { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
     .palcard-container.flipped .palcard-flipper { transform: rotateY(180deg); }
 
     .palcard {
@@ -198,7 +159,6 @@
     .back-sns-item.inactive { opacity: 0.4; pointer-events: none; }
     .back-flip-tip { font-size: 0.48rem; color: var(--text-sub); letter-spacing: 0.1em; opacity: 0.7; text-align: center; }
 
-    /* ボトムナビゲーション */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 414px; height: 60px;
@@ -212,7 +172,6 @@
 </head>
 <body>
 
-  <!-- PALS FEED（タイトル）とその下の「＋ 投稿する」ボタンをひとまとめにして固定 -->
   <div class="fixed-top-area">
     <div class="header-row">
       <div style="width: 30px;"></div>
@@ -227,7 +186,6 @@
     <div id="loading-indicator" class="loading-indicator">読み込み中...</div>
   </div>
 
-  <!-- 投稿作成モーダル -->
   <div id="post-modal" class="modal-overlay">
     <div class="modal-content">
       <h3 style="font-family:'Cinzel'; border-bottom:1px solid #333; padding-bottom:6px; color:var(--gold); margin-bottom:4px;">NEW POST</h3>
@@ -265,12 +223,15 @@
     </div>
   </div>
 
-  <!-- PALCARD ＆ 9マス詳細表示用モーダル -->
   <div id="palcard-modal" class="modal-overlay">
-    <div class="palcard-modal-container" id="palcard-modal-inner" onclick="event.stopPropagation()">
+    <div class="palcard-modal-container" id="palcard-modal-inner">
       
-      <div class="palcard-container" id="modal-palcard-container" onclick="toggleModalCardFlip()">
-        <div class="palcard-flipper">
+      <div class="modal-close-bar">
+        <span style="font-size: 0.55rem; color: var(--text-sub);">← 右にスワイプして閉じられます</span>
+      </div>
+
+      <div class="palcard-container" id="modal-palcard-container">
+        <div class="palcard-flipper" id="modal-palcard-flipper">
           
           <div class="palcard" id="modal-palcard-face">
             <div class="palcard-brand">PALCARD</div>
@@ -363,16 +324,14 @@
         }
       });
       initSwipeToClose();
+      initCardFlipHandler();
     });
 
-    // 着せ替え設定（テーマ・フレーム）を適用する関数
     function applyCustomConfig() {
       const configSaved = localStorage.getItem('parmel_custom_config');
       if (!configSaved) return;
       try {
         const config = JSON.parse(configSaved);
-
-        // テーマの適用
         if (config.theme) {
           const t = config.theme;
           if (t.bgMain) document.documentElement.style.setProperty('--bg-main', t.bgMain);
@@ -380,8 +339,6 @@
           if (t.textSub) document.documentElement.style.setProperty('--text-sub', t.textSub);
           if (t.gold) document.documentElement.style.setProperty('--gold', t.gold);
         }
-
-        // カード・アバターフレームの適用
         if (config.frame) {
           const f = config.frame;
           if (f.cardBg) {
@@ -399,30 +356,41 @@
             if (avWrapper) avWrapper.style.background = f.avatarBg;
           }
         }
-      } catch(e) {
-        console.error('Failed to load custom config', e);
-      }
+      } catch(e) {}
     }
 
     function initSwipeToClose() {
       const modal = document.getElementById('palcard-modal');
       const container = document.getElementById('palcard-modal-inner');
       let startX = 0;
+      let startY = 0;
       let currentX = 0;
       let isSwiping = false;
+      let hasMoved = false;
 
       container.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        currentX = startX;
         isSwiping = true;
+        hasMoved = false;
       }, { passive: true });
 
       container.addEventListener('touchmove', (e) => {
         if (!isSwiping) return;
         currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
         const diffX = currentX - startX;
-        if (diffX > 0) {
+        const diffY = Math.abs(currentY - startY);
+
+        if (Math.abs(diffX) > 10 || diffY > 10) {
+          hasMoved = true;
+        }
+
+        if (diffX > 15 && diffX > diffY) {
+          modal.style.transition = 'none';
           modal.style.transform = `translateX(${diffX}px)`;
-          modal.style.opacity = `${1 - (diffX / window.innerWidth) * 1.5}`;
+          modal.style.opacity = `${Math.max(0, 1 - (diffX / window.innerWidth) * 1.5)}`;
         }
       }, { passive: true });
 
@@ -432,7 +400,7 @@
         const diffX = currentX - startX;
         modal.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
         
-        if (diffX > 80) {
+        if (diffX > 70) {
           modal.style.transform = `translateX(100%)`;
           modal.style.opacity = '0';
           setTimeout(() => {
@@ -443,6 +411,28 @@
         } else {
           modal.style.transform = '';
           modal.style.opacity = '';
+        }
+      });
+    }
+
+    function initCardFlipHandler() {
+      const cardContainer = document.getElementById('modal-palcard-container');
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      cardContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      cardContainer.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const moveX = Math.abs(touchEndX - touchStartX);
+        const moveY = Math.abs(touchEndY - touchStartY);
+
+        if (moveX < 10 && moveY < 10) {
+          cardContainer.classList.toggle('flipped');
         }
       });
     }
@@ -637,6 +627,9 @@
     }
 
     function openPalCardModal(data) {
+      const container = document.getElementById('modal-palcard-container');
+      container.classList.remove('flipped');
+
       document.getElementById('modal-pet-name').innerText = data.name;
       adjustModalNameFontSize(data.name);
 
@@ -646,8 +639,6 @@
       document.getElementById('modal-pet-likes').innerText = data.likes;
       document.getElementById('modal-pet-img').src = data.avatar;
       document.getElementById('modal-owner-name').innerText = data.owner;
-
-      document.getElementById('modal-palcard-container').classList.remove('flipped');
 
       const modalGridEl = document.getElementById('modal-profile-grid');
       modalGridEl.innerHTML = '';
@@ -675,9 +666,13 @@
       });
 
       const modalEl = document.getElementById('palcard-modal');
+      modalEl.style.transition = 'none';
       modalEl.style.transform = '';
       modalEl.style.opacity = '';
       modalEl.classList.add('active');
+
+      const modalInner = document.getElementById('palcard-modal-inner');
+      if (modalInner) modalInner.scrollTop = 0;
     }
 
     function adjustModalNameFontSize(nameText) {
@@ -688,11 +683,6 @@
       else if (len <= 6) nameEl.style.fontSize = '1.7rem';
       else if (len <= 8) nameEl.style.fontSize = '1.35rem';
       else nameEl.style.fontSize = '1.1rem';
-    }
-
-    function toggleModalCardFlip() {
-      const container = document.getElementById('modal-palcard-container');
-      container.classList.toggle('flipped');
     }
 
     function toggleLike(btn) {
