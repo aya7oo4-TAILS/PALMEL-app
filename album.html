@@ -23,25 +23,25 @@
       background: var(--bg-main);
       color: var(--text-main);
       font-family: 'Noto Sans JP', sans-serif;
-      overflow-x: hidden;
-      overflow-y: auto;
-      /* スマホでのバウンススクロールをスムーズに */
-      -webkit-overflow-scrolling: touch;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      /* ボトムナビ（60px）に隠れないよう、下部に十分な余白を確保 */
-      padding: 12px 12px 160px 12px;
+      overflow: hidden;
+      position: fixed;
     }
 
     .app-viewport {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
       width: 100%;
       max-width: 414px;
+      height: 100%;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      /* 下部パディングを適切な隙間（80px）に調整 */
+      padding: 12px 12px 90px 12px;
     }
 
     .page-title {
@@ -266,7 +266,7 @@
     }
     .history-phone-save-btn:hover { color: var(--text-main); }
 
-    /* 保存された履歴内のミニ9マスグリッド (プレビューと同じサイズ) */
+    /* 保存された履歴内のミニ9マスグリッド */
     .history-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -332,26 +332,42 @@
       filter: brightness(0.45);
     }
 
-    /* ボトムナビの下に絶対に隠れないようにするためのスクロール余白スペーサー */
-    .scroll-spacer {
-      width: 100%;
-      height: 100px;
-    }
-
-    /* ボトムナビゲーション */
+    /* ボトムナビゲーション (画面下に固定) */
     .bottom-nav {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 414px; height: 60px;
-      background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(16px);
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 414px;
+      height: 60px;
+      background: rgba(15, 17, 20, 0.95);
+      backdrop-filter: blur(16px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex; justify-content: space-around; align-items: center; z-index: 99999;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 99999;
     }
-    .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.62rem; cursor: pointer; width: 25%; text-decoration: none; }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.62rem;
+      cursor: pointer;
+      width: 25%;
+      text-decoration: none;
+    }
     .nav-btn.active { color: var(--gold); }
   </style>
 </head>
 <body>
 
+  <!-- スクロール可能なビューポート -->
   <div class="app-viewport">
     <h1 class="page-title">ALBUM</h1>
 
@@ -380,9 +396,6 @@
         <!-- 保存された履歴がここに入ります -->
       </div>
     </div>
-
-    <!-- ボトムナビの下までしっかりスクロールするための余白スペーサー -->
-    <div class="scroll-spacer"></div>
   </div>
 
   <!-- ボトムナビゲーション -->
