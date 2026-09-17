@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>PARMEL - PALRIUM</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -15,34 +15,42 @@
       --text-main: #f5f6f8;
       --text-sub: #9aa0a6;
       --gold: #e5c07b;
-      --radius-card: 16px; /* カード全体の丸みをアップ */
-      --radius-grid: 12px;  /* 9マスの丸みもアップ */
+      --radius-card: 16px;
+      --radius-grid: 12px;
       --radius-switch: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
     
-    html, body {
+    html {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-main);
+      overflow: hidden; /* 画面全体のバウンスを防ぐ */
+    }
+
+    body {
       width: 100%;
       height: 100%;
       background: var(--bg-main);
       color: var(--text-main);
       font-family: 'Noto Sans JP', sans-serif;
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
-
-    body {
       display: flex;
       justify-content: center;
-      padding: 12px 12px 80px;
+      overflow: hidden;
     }
 
     .app-viewport {
       width: 100%;
       max-width: 414px;
+      height: 100%;
       display: flex;
       flex-direction: column;
+      /* ここでスクロールさせることで、一番下まで確実にスクロールできて指を離しても戻らないようにする */
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px 12px 120px 12px;
       gap: 16px;
     }
 
@@ -682,7 +690,9 @@
 
       document.getElementById('screen-list').classList.remove('active');
       document.getElementById('screen-detail').classList.add('active');
-      window.scrollTo(0, 0);
+      
+      const viewport = document.querySelector('.app-viewport');
+      if (viewport) viewport.scrollTop = 0;
 
       setupSwipeBack();
     };
@@ -690,7 +700,10 @@
     window.showListScreen = function() {
       document.getElementById('screen-detail').classList.remove('active');
       document.getElementById('screen-list').classList.add('active');
-      window.scrollTo(0, 0);
+      
+      const viewport = document.querySelector('.app-viewport');
+      if (viewport) viewport.scrollTop = 0;
+      
       renderList();
     };
 
