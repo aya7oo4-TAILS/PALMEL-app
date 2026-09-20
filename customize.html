@@ -237,26 +237,24 @@
     .palcard.theme-gold { background: linear-gradient(135deg, #3d3422 0%, #1a1710 100%); }
     .palcard.theme-midnight { background: linear-gradient(135deg, #162235 0%, #0a0e14 100%); }
     .palcard.theme-rose { background: linear-gradient(135deg, #331d25 0%, #140a0e 100%); }
+    .palcard.theme-emerald { background: linear-gradient(135deg, #1b3327 0%, #0c1712 100%); }
+    .palcard.theme-amethyst { background: linear-gradient(135deg, #2a1b33 0%, #120c17 100%); }
+    .palcard.theme-sunset { background: linear-gradient(135deg, #38241d 0%, #170e0a 100%); }
 
     /* PALCARD縁（Card Edge） */
     .palcard.cardedge-none { border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--card-shadow); }
     .palcard.cardedge-gold { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(229, 192, 123, 0.35), var(--card-shadow); }
     .palcard.cardedge-neon { border: 2px solid #00f2fe; box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), var(--card-shadow); }
     .palcard.cardedge-ruby { border: 2px solid #ff758c; box-shadow: 0 0 20px rgba(255, 117, 140, 0.45), var(--card-shadow); }
+    .palcard.cardedge-sapphire { border: 2px solid #3a86ff; box-shadow: 0 0 20px rgba(58, 134, 255, 0.45), var(--card-shadow); }
+    .palcard.cardedge-emerald { border: 2px solid #2ec4b6; box-shadow: 0 0 20px rgba(46, 196, 182, 0.45), var(--card-shadow); }
 
     /* アバターフレーム */
     .avatar-wrapper.frame-none { background: var(--avatar-bg); padding: 3px; box-shadow: none; }
-    .avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); padding: 4px; box-shadow: 0 0 12px rgba(229,192,123,0.5); }
-    .avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); padding: 4px; box-shadow: 0 0 12px rgba(0,242,254,0.5); }
-    .avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); padding: 4px; box-shadow: 0 0 12px rgba(255,117,140,0.5); }
-
-    /* 称号スタイル */
-    .sparkle-text {
-      background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.6));
-    }
+    .avatar-wrapper.frame-gold { background: linear-gradient(135deg, #e5c07b, #8f6b28); padding: 3px; box-shadow: 0 0 10px rgba(229,192,123,0.4); }
+    .avatar-wrapper.frame-neon { background: linear-gradient(135deg, #00f2fe, #4facfe); padding: 3px; box-shadow: 0 0 10px rgba(0,242,254,0.4); }
+    .avatar-wrapper.frame-ruby { background: linear-gradient(135deg, #ff758c, #ff7eb3); padding: 3px; box-shadow: 0 0 10px rgba(255,117,140,0.4); }
+    .avatar-wrapper.frame-sapphire { background: linear-gradient(135deg, #3a86ff, #8338ec); padding: 3px; box-shadow: 0 0 10px rgba(58,134,255,0.4); }
 
     /* スクロールエリア共通 */
     .scrollable-controls {
@@ -438,31 +436,37 @@
       <div class="scrollable-controls" style="margin-top: 12px;">
         <div class="customize-section">
           <div class="section-title">PALCARD テーマ</div>
-          <div class="option-grid" id="theme-options">
+          <div class="option-grid" id="theme-options" style="grid-template-columns: repeat(3, 1fr);">
             <button class="option-btn active" data-type="theme" data-value="theme-dark">標準</button>
             <button class="option-btn" data-type="theme" data-value="theme-gold">ゴールド</button>
             <button class="option-btn" data-type="theme" data-value="theme-midnight">ミッドナイト</button>
             <button class="option-btn" data-type="theme" data-value="theme-rose">ローズ</button>
+            <button class="option-btn" data-type="theme" data-value="theme-emerald">エメラルド</button>
+            <button class="option-btn" data-type="theme" data-value="theme-amethyst">アメジスト</button>
+            <button class="option-btn" data-type="theme" data-value="theme-sunset">サンセット</button>
           </div>
         </div>
 
         <div class="customize-section">
           <div class="section-title">カード縁（エッジ）</div>
-          <div class="option-grid" id="cardedge-options">
+          <div class="option-grid" id="cardedge-options" style="grid-template-columns: repeat(3, 1fr);">
             <button class="option-btn active" data-type="cardEdge" data-value="cardedge-none">標準</button>
             <button class="option-btn" data-type="cardEdge" data-value="cardedge-gold">ゴールド</button>
             <button class="option-btn" data-type="cardEdge" data-value="cardedge-neon">ネオン</button>
             <button class="option-btn" data-type="cardEdge" data-value="cardedge-ruby">ルビー</button>
+            <button class="option-btn" data-type="cardEdge" data-value="cardedge-sapphire">サファイア</button>
+            <button class="option-btn" data-type="cardEdge" data-value="cardedge-emerald">エメラルド</button>
           </div>
         </div>
 
         <div class="customize-section">
           <div class="section-title">アバターフレーム</div>
-          <div class="option-grid" id="frame-options">
+          <div class="option-grid" id="frame-options" style="grid-template-columns: repeat(3, 1fr);">
             <button class="option-btn active" data-type="frame" data-value="frame-none">なし</button>
             <button class="option-btn" data-type="frame" data-value="frame-gold">黄金縁</button>
             <button class="option-btn" data-type="frame" data-value="frame-neon">ネオン</button>
             <button class="option-btn" data-type="frame" data-value="frame-ruby">ルビー</button>
+            <button class="option-btn" data-type="frame" data-value="frame-sapphire">サファイア</button>
           </div>
         </div>
 
@@ -470,7 +474,11 @@
           <div class="section-title">称号設定</div>
           <div class="option-grid" style="grid-template-columns: repeat(2, 1fr);" id="title-options">
             <button class="option-btn active" data-type="title" data-value="FIRST PAL">FIRST PAL</button>
-            <button class="option-btn sparkle-text" data-type="title" data-value="GOD">🌟 GOD 🌟</button>
+            <button class="option-btn" data-type="title" data-value="おやつ監視員">おやつ監視員</button>
+            <button class="option-btn" data-type="title" data-value="甘えん坊将軍">甘えん坊将軍</button>
+            <button class="option-btn" data-type="title" data-value="飼い主ストーカー">飼い主ストーカー</button>
+            <button class="option-btn" data-type="title" data-value="天使の寝顔">天使の寝顔</button>
+            <button class="option-btn" data-type="title" data-value="雲の守護者">雲の守護者</button>
           </div>
         </div>
 
@@ -565,12 +573,6 @@
       card.className = `palcard ${currentConfig.theme} ${currentConfig.cardEdge}`;
       avatar.className = `avatar-wrapper ${currentConfig.frame}`;
       titleEl.textContent = currentConfig.title;
-
-      if (currentConfig.title === 'GOD') {
-        titleEl.classList.add('sparkle-text');
-      } else {
-        titleEl.classList.remove('sparkle-text');
-      }
 
       // 2. 9マスプレビュー更新
       const gridPreviewContainer = document.getElementById('preview-grid-container');
